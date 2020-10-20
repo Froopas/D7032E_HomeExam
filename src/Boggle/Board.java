@@ -42,7 +42,7 @@ public class Board {
         Random rnd = new Random(seed);
         ArrayList<ArrayList<String>> dice = dieSet.getDiceArray();
         ArrayList<ArrayList<String>> rows = new ArrayList<>(dice);
-        Collections.shuffle(rows);
+        Collections.shuffle(rows, rnd);
         for (ArrayList<String> row: rows) {
             board[rowindex][colindex] = row.get(rnd.nextInt(row.size()));
             colindex = (colindex + 1) % x;

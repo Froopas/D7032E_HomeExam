@@ -2,6 +2,8 @@ package Boggle.BoggleMode;
 
 import org.json.JSONObject;
 
+import Boggle.Board;
+
 public interface BoggleMode {
 
     /**
@@ -15,6 +17,8 @@ public interface BoggleMode {
      * @param setting the settings with which to run the game mode
      */
     public void initialize(JSONObject setting) throws Exception;
+
+    public Board getBoard();
 
     /**
      * Check if the given input is valid

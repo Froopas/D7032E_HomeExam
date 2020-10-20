@@ -112,6 +112,7 @@ public class StandardBoggle implements BoggleMode {
             board.initialize(dieSet);
             return;
         }
+        board.initialize(dieSet, seed);
     }
 
     public void searchAllWords() {
@@ -128,6 +129,13 @@ public class StandardBoggle implements BoggleMode {
             }
         }
         searchCompleted = true;
+    }
+
+    public ArrayList<String> getAllWords() {
+        if(searchCompleted) {
+            return foundWordsList;
+        }
+        return null;
     }
 
 
@@ -172,6 +180,11 @@ public class StandardBoggle implements BoggleMode {
     private class Player {
         ArrayList<String> words = new ArrayList<String>();
         int score = 0;
+    }
+
+    @Override
+    public Board getBoard() {
+        return board;
     }
     
 }
