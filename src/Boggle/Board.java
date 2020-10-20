@@ -25,19 +25,16 @@ public class Board {
         return board[y][x];
     }
 
-    public Board() {}
-
-    public Board(Die dieSet) {
+    public void initialize(Die dieSet) {
         initialize(dieSet, System.currentTimeMillis());
-    }
-
-    public Board(Die dieSet, long seed) {
-        initialize(dieSet, seed);
     }
 
     public void initialize(Die dieSet, long seed) {
         dim = dieSet.getDimenstion();
         int x = dim.getX();
+        int y = dim.getY();
+
+        board = new String[y][x];
 
         int colindex = 0;
         int rowindex = 0;
@@ -47,9 +44,9 @@ public class Board {
         ArrayList<ArrayList<String>> rows = new ArrayList<>(dice);
         Collections.shuffle(rows);
         for (ArrayList<String> row: rows) {
-            board[rowindex][colindex] = row.get(rnd.nextInt(x));
+            board[rowindex][colindex] = row.get(rnd.nextInt(row.size()));
             colindex = (colindex + 1) % x;
-            rowindex = colindex == 1?rowindex + 1: rowindex;
+            rowindex = colindex == 0?rowindex + 1: rowindex;
         }
     }
 }

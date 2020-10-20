@@ -22,6 +22,8 @@ public class StandardBoggle implements BoggleMode {
 
     private Trie foundWords;
 
+    private ArrayList<String> foundWordsList;
+
     private boolean searchCompleted;
 
     private ArrayList<Player> players;
@@ -54,6 +56,7 @@ public class StandardBoggle implements BoggleMode {
         if (numberOfPlayers < 2) {
             throw new Exception("The amount of players are too low");
         }
+        players = new ArrayList<Player>();
         for (int i = 0; i < numberOfPlayers; i++) {
             players.add(new Player());
         }
@@ -104,21 +107,23 @@ public class StandardBoggle implements BoggleMode {
     }
 
     private void generateBoard(Die dieSet, long seed) {
+        board = new Board();
         if (seed == 0) {
-            board = new Board(dieSet);
+            board.initialize(dieSet);
             return;
         }
-        board = new Board(dieSet,seed);
     }
 
     public void searchAllWords() {
+        this.foundWords = new Trie();
+        this.foundWordsList = new ArrayList<String>();
         int x = board.getDimension().getX();
         int y = board.getDimension().getY();
         boolean[][] processed = new boolean[y][x];
 
         for (int row = 0; row < y; row++) {
             for (int col = 0; col < x; col++) {
-                String ch = board.getBoard(x, y);
+                String ch = board.getBoard(col, row);
                 searchBoard(dictionary.getRoot(), col, row, processed, ch);
             }
         }
@@ -132,6 +137,7 @@ public class StandardBoggle implements BoggleMode {
     private void searchBoard(TrieNode node, int x, int y, boolean[][] processed, String path) {
         if (node.isWord()) {
             foundWords.insert(path);
+            foundWordsList.add(path);
         }
 
         processed[y][x] = true;
@@ -148,7 +154,7 @@ public class StandardBoggle implements BoggleMode {
                         searchBoard(entryChild, x + rowOpt[k], y + colOpt[k], processed, path.concat("QU")); 
                     // See if the child of the trie has the same char as the board
                     } else if (board.getBoard(x + rowOpt[k], y + colOpt[k]).equals(entry.getKey().toString())) {
-                        searchBoard(entry.getValue(), x + rowOpt[k], y + colOpt[k], processed, path.concat(entry.getValue().toString()));
+                        searchBoard(entry.getValue(), x + rowOpt[k], y + colOpt[k], processed, path.concat(entry.getKey().toString()));
                     }
                 }
             }
