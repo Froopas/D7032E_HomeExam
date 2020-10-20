@@ -103,7 +103,10 @@ public class StandardBoggle implements BoggleMode {
                 if(isValid(y + colOpt[k], x + rowOpt[k], processed, entry.getKey())) {
                     // Check the special case of Qu on the board
                     if (board.getBoard(x + rowOpt[k], y + colOpt[k]).equals("Qu") && entry.getKey().toString().equals("Q") ) {
-                        TrieNode entryChild = entry.getValue().getChildren().get('U');  
+                        TrieNode entryChild = entry.getValue().getChildren().get('U');
+                        if (entryChild == null) {
+                            continue;
+                        }
                         searchBoard(entryChild, x + rowOpt[k], y + colOpt[k], processed, path.concat("QU")); 
                     // See if the child of the trie has the same char as the board
                     } else if (board.getBoard(x + rowOpt[k], y + colOpt[k]).equals(entry.getKey().toString())) {
