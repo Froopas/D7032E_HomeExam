@@ -1,0 +1,13 @@
+{
+    "gameMode": "string",
+    "generousBoggle": "true|false",
+    "show-solution":"true|false",
+    "language": {
+        "name": "English|Spanish|etc",
+        "size": "4x4|3x4|4x3|3x8|etc",
+        "dictionary":"Collin|Peder|Ragnar|filename without extention"
+    },
+    "number_of_players": "2-inf",
+    "time_of_game":"16:00",
+    "seed": "opt, else long"
+}

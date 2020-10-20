@@ -1,7 +1,7 @@
 package Util;
 
 public class Dimension {
-    int x,y;
+    private int x,y;
 
     public Dimension(int x, int y) {
         this.x = x;
