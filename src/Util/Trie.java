@@ -20,6 +20,21 @@ public class Trie {
         return delete(root, word, 0);
     }
 
+    public int getWordCount(TrieNode node) {
+        int result = 0;
+
+        if (node.isWord()) {
+            result += 1;
+        }
+        
+        for (var child: node.getChildren().entrySet()) {
+            if (child != null) {
+                result += getWordCount(child.getValue());
+            }
+        }
+        return result;
+    }
+
     public boolean containsNode(String word) {
         TrieNode current = root;
 

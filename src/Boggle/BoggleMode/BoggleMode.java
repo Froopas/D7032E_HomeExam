@@ -14,12 +14,12 @@ public interface BoggleMode {
      * Initializes the gamemode with the settings
      * @param setting the settings with which to run the game mode
      */
-    public void initialize(JSONObject setting);
+    public void initialize(JSONObject setting) throws Exception;
 
     /**
      * Check if the given input is valid
      * @param input string to check
      * @return Message
      */
-    public String checkInput(String input);
+    public String checkInput(String input, int playerID) throws Exception;
 }

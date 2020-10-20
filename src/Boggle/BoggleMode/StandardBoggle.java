@@ -1,5 +1,8 @@
 package Boggle.BoggleMode;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.json.JSONObject;
 
 import Boggle.Board;
@@ -21,6 +24,8 @@ public class StandardBoggle implements BoggleMode {
 
     private boolean searchCompleted;
 
+    private ArrayList<Player> players;
+
     @Override
     public JSONObject getSettings() {
         JSONObject body = new JSONObject();
@@ -40,10 +45,18 @@ public class StandardBoggle implements BoggleMode {
     }
 
     @Override
-    public void initialize(JSONObject setting) {
+    public void initialize(JSONObject setting) throws Exception {
         JSONObject language = setting.getJSONObject("language");
 
         generousBoggleOn = setting.getBoolean("generousBoggle");
+
+        int numberOfPlayers = setting.getInt("numberOfPlayers");
+        if (numberOfPlayers < 2) {
+            throw new Exception("The amount of players are too low");
+        }
+        for (int i = 0; i < numberOfPlayers; i++) {
+            players.add(new Player());
+        }
 
         String langName = language.getString("name");
         String dimension = language.getString("size");
@@ -60,9 +73,34 @@ public class StandardBoggle implements BoggleMode {
     }
 
     @Override
-    public String checkInput(String input) {
-        // TODO Auto-generated method stub
-        return null;
+    public String checkInput(String input, int playerID) {
+        Player player = players.get(playerID);
+        if (searchCompleted) {
+            if (foundWords.containsNode(input)) {
+                if (player.words.contains(input)) {
+                    return "You have already submitted this word";
+                }
+                player.score += calculateScore(input); 
+                player.words.add(input);
+                return "OK";
+            }
+        }
+        return "Search is not completed";
+    }
+
+    private int calculateScore(String input) {
+        int length = input.length();
+        if (length >= 3 && length <= 4) {
+            return 1;
+        } else if (length > 4 && length <7 ) {
+            return length - 3;
+        } else if (length == 7) {
+            return 5;
+        } else if (length > 7) {
+            return 11;
+        } else {
+            return 0;
+        }
     }
 
     private void generateBoard(Die dieSet, long seed) {
@@ -123,6 +161,11 @@ public class StandardBoggle implements BoggleMode {
         return  (x>= 0 && x < board.getDimension().getX()) && // see if index is out of bounds
                 (y>= 0 && y < board.getDimension().getX()) &&
                 (!processed[y][x] || generousBoggleOn); // see if the tile is not processed or generous boggle is on
+    }
+
+    private class Player {
+        ArrayList<String> words = new ArrayList<String>();
+        int score = 0;
     }
     
 }
