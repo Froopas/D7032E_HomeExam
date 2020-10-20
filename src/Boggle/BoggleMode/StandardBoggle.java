@@ -101,7 +101,14 @@ public class StandardBoggle implements BoggleMode {
         for (var entry: node.getChildren().entrySet()) {
             for (int k = 0; k < 8; k++) {
                 if(isValid(y + colOpt[k], x + rowOpt[k], processed, entry.getKey())) {
-                    searchBoard(entry.getValue(), x, y, processed, path.concat(entry.getValue().toString()));
+                    // Check the special case of Qu on the board
+                    if (board.getBoard(x + rowOpt[k], y + colOpt[k]).equals("Qu") && entry.getKey().toString().equals("Q") ) {
+                        TrieNode entryChild = entry.getValue().getChildren().get('U');  
+                        searchBoard(entryChild, x + rowOpt[k], y + colOpt[k], processed, path.concat("QU")); 
+                    // See if the child of the trie has the same char as the board
+                    } else if (board.getBoard(x + rowOpt[k], y + colOpt[k]).equals(entry.getKey().toString())) {
+                        searchBoard(entry.getValue(), x + rowOpt[k], y + colOpt[k], processed, path.concat(entry.getValue().toString()));
+                    }
                 }
             }
         }
@@ -109,11 +116,10 @@ public class StandardBoggle implements BoggleMode {
         processed[y][x]= false;
     }
 
-    private boolean isValid(int x, int y, boolean[][] processed, String ch) {
+    private boolean isValid(int x, int y, boolean[][] processed, Character ch) {
         return  (x>= 0 && x < board.getDimension().getX()) && // see if index is out of bounds
                 (y>= 0 && y < board.getDimension().getX()) &&
-                (!processed[y][x] || generousBoggleOn) && // see if the tile is not processed or generous boggle is on
-                board.getBoard(x, y).equals(ch.toString()); // see if the char is the same as the guess
+                (!processed[y][x] || generousBoggleOn); // see if the tile is not processed or generous boggle is on
     }
     
 }
