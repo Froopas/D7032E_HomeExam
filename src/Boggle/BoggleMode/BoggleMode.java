@@ -27,7 +27,11 @@ public interface BoggleMode {
 
     public ArrayList<Player> getPlayers();
 
+    public void startGame();
+
     public void broadcastMessage(String message, int excludePlayer);
+
+    public void finnishGame();
 
     /**
      * Check if the given input is valid

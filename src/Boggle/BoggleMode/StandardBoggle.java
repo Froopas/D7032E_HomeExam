@@ -18,6 +18,7 @@ public class StandardBoggle implements BoggleMode {
     private Board board;
 
     private boolean generousBoggleOn;
+    private boolean showSolution;
 
     private Trie dictionary;
 
@@ -193,5 +194,45 @@ public class StandardBoggle implements BoggleMode {
     public Board getBoard() {
         return board;
     }
-    
+
+    @Override
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    @Override
+    public void startGame() {
+        for (Player pl: players) {
+            pl.setPlaying(true);
+        }
+        this.broadcastMessage("Lets play!!", -1);
+    }
+
+    @Override
+    public void finnishGame() {
+        Player winner = null;
+        for (Player pl: players) {
+            if (winner == null) {
+                winner = pl;
+            } else if(winner.getScore() < pl.getScore()) {
+                winner = pl;
+            }
+            pl.sendMessage(String.format("You got a score of %d", pl.getScore()));
+            pl.setPlaying(false);
+        }
+        broadcastMessage(String.format("The winner of this game is player %d with a score of %d", winner.getPlayerID(), winner.getScore()), -1);
+        winner.sendMessage("Congratualations you won!!");
+
+        if (showSolution) {
+            String message = "These are the possible words\n";
+            StringBuffer sb = new StringBuffer();
+            for (String word: foundWordsList) {
+                sb.append(word.concat("\n"));
+            }
+            message = message.concat(sb.toString());
+            for (Player pl: players) {
+                pl.sendMessage(message);
+            }
+        }
+    }
 }

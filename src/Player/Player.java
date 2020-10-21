@@ -19,6 +19,11 @@ public class Player {
     private boolean currentlyPlaying;
 
     public void run() {
+        try {
+            visual.renderBoard(boggle.getBoard());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         while(currentlyPlaying) {
             String input = "";
             try {
@@ -79,4 +84,7 @@ public class Player {
         this.boggle = boggle;
     }
 
+    public void setPlaying(boolean shouldPlay) {
+        this.currentlyPlaying = shouldPlay;
+    }
 }
