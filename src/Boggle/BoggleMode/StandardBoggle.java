@@ -9,6 +9,7 @@ import Boggle.Board;
 import Language.Die;
 import Language.LanguageHandler;
 import Language.LanguageHolder;
+import Player.Player;
 import Util.Trie;
 import Util.TrieNode;
 
@@ -57,9 +58,6 @@ public class StandardBoggle implements BoggleMode {
             throw new Exception("The amount of players are too low");
         }
         players = new ArrayList<Player>();
-        for (int i = 0; i < numberOfPlayers; i++) {
-            players.add(new Player());
-        }
 
         String langName = language.getString("name");
         String dimension = language.getString("size");
@@ -80,15 +78,29 @@ public class StandardBoggle implements BoggleMode {
         Player player = players.get(playerID);
         if (searchCompleted) {
             if (foundWords.containsNode(input)) {
-                if (player.words.contains(input)) {
+                if (player.isAccepted(input)) {
                     return "You have already submitted this word";
                 }
-                player.score += calculateScore(input); 
-                player.words.add(input);
+                player.setScore(player.getScore() + calculateScore(input)); 
+                player.addAcceptedInputs(input);
                 return "OK";
             }
         }
         return "Search is not completed";
+    }
+
+    @Override
+    public void broadcastMessage(String message, int excludePlayer) {
+        for(Player player: players) {
+            if (player.getPlayerID() == excludePlayer) {
+                continue;
+            }
+            player.sendMessage(message);
+        }
+    }
+
+    public void addPlayer(Player player) {
+        this.players.add(player);
     }
 
     private int calculateScore(String input) {
@@ -175,11 +187,6 @@ public class StandardBoggle implements BoggleMode {
         return  (x>= 0 && x < board.getDimension().getX()) && // see if index is out of bounds
                 (y>= 0 && y < board.getDimension().getX()) &&
                 (!processed[y][x] || generousBoggleOn); // see if the tile is not processed or generous boggle is on
-    }
-
-    private class Player {
-        ArrayList<String> words = new ArrayList<String>();
-        int score = 0;
     }
 
     @Override
