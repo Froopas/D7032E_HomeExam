@@ -2,6 +2,7 @@ package Language;
 
 import Util.Trie;
 
+// Used as a struct
 public class LanguageHolder {
     private String language;
     private Die dice;

@@ -13,7 +13,6 @@ import Boggle.BoggleMode.BoggleMode;
 import Boggle.BoggleMode.StandardBoggle;
 import Menu.Menu;
 import Menu.MenuUI.AsciiMenuUI;
-import Menu.MenuUI.MenuUI;
 import Player.Player;
 import Player.PlayerUI.TerminalPlayerUI;
 import Player.PlayerUI.SocketPlayerUI;
@@ -28,11 +27,10 @@ public class VarietyBoggle {
     ArrayList<Socket> sockets = new ArrayList<Socket>();
 
     public void run() {
-        // run menu
-        // get settings from menu
         JSONObject setting = BoggleFactory.getDefaultSettings("StandardBoggle");
 
         while (true) {
+            // Prepare menu
             AsciiMenuUI menuUi = new AsciiMenuUI();
             menuUi.setInputStream(System.in);
             menuUi.setOutputStream(System.out);
@@ -74,6 +72,7 @@ public class VarietyBoggle {
 
     }
 
+    // Prepares for the game, start sockets for all players and if needed find all possible words
     public void prepareGame(String gamemode, int numberOfPlayers) {
         if (!gamemode.equals("FoggleBoggle")) {
             ExecutorService startup = Executors.newFixedThreadPool(2);
@@ -108,6 +107,7 @@ public class VarietyBoggle {
         }
     }
 
+    // Start the game for all players
     public void playGame(int numberOfPlayers, int gameTime) {
         ExecutorService playThreads = Executors.newFixedThreadPool(numberOfPlayers);
         for(Player pl:boggle.getPlayers()) {
@@ -127,6 +127,7 @@ public class VarietyBoggle {
         }
     }
 
+    // Start sockets and create players for all users
     public void server(int numberOfPlayers) {
         boggle.addPlayer(createLocalPlayer());
         try {

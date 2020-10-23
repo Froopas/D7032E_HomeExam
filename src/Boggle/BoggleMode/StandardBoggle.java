@@ -1,9 +1,6 @@
 package Boggle.BoggleMode;
 
 import java.util.ArrayList;
-import java.util.Map;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import Boggle.Board;
@@ -116,6 +113,7 @@ public class StandardBoggle implements BoggleMode {
         }
     }
 
+    @Override
     public void addPlayer(Player player) {
         this.players.add(player);
     }
@@ -135,6 +133,7 @@ public class StandardBoggle implements BoggleMode {
         }
     }
 
+    // helper function for board generation
     private void generateBoard(Die dieSet, long seed) {
         board = new Board();
         if (seed == 0) {
@@ -144,6 +143,10 @@ public class StandardBoggle implements BoggleMode {
         board.initialize(dieSet, seed);
     }
 
+    /**
+     * Fetches all words found on board
+     * @return all words on board
+     */
     public ArrayList<String> getAllWords() {
         if(searchCompleted) {
             return foundWordsList;
@@ -152,9 +155,17 @@ public class StandardBoggle implements BoggleMode {
     }
 
 
-    private static int[] rowOpt = {-1,-1,-1, 0, 0, 1, 1, 1}; // all possible moves in a boggle board
+    // All possible movements from a position, x represents the move 0 is current
+    /*   x,x,x
+     *   x,0,x
+     *   x,x,x
+     */
+    private static int[] rowOpt = {-1,-1,-1, 0, 0, 1, 1, 1};
     private static int[] colOpt = {-1, 0, 1,-1, 1,-1, 0, 1};
 
+    /**
+     * Searches through the board to find which words in the dictionary that can be placed on the board
+     */
     public void searchAllWords() {
         this.foundWords = new Trie();
         this.foundWordsList = new ArrayList<String>();
@@ -183,6 +194,7 @@ public class StandardBoggle implements BoggleMode {
         searchCompleted = true;
     }
 
+    // Helper function to search the board
     private void searchBoard(TrieNode node, int x, int y, boolean[][] processed, String path) {
         if (node.isWord()) {
             foundWords.insert(path);
@@ -213,6 +225,7 @@ public class StandardBoggle implements BoggleMode {
         processed[y][x]= false;
     }
 
+    // checks if the position x,y is within the board and if the position have been processed
     private boolean isValid(int x, int y, boolean[][] processed, Character ch) {
         return  (x>= 0 && x < board.getDimension().getX()) && // see if index is out of bounds
                 (y>= 0 && y < board.getDimension().getY()) &&

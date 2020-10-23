@@ -21,16 +21,39 @@ public interface BoggleMode {
      */
     public void initialize(JSONObject setting) throws Exception;
 
+    /**
+     * Fetches the current board
+     * @return current board
+     */
     public Board getBoard();
 
+    /**
+     * Adds a player to the gamemode
+     * @param player to add
+     */
     public void addPlayer(Player player);
 
+    /**
+     * Get the list of current players
+     * @return 
+     */
     public ArrayList<Player> getPlayers();
 
+    /**
+     * Starts the game for players to active and broadcasts that the game is starting
+     */
     public void startGame();
 
+    /**
+     * Writes message to all players excluding exclude Player
+     * @param message to be broadcasted
+     * @param excludePlayer player which the broadcast should exclude
+     */
     public void broadcastMessage(String message, int excludePlayer);
 
+    /**
+     * Stops the game for all players and broadcasts the winning player
+     */
     public void finnishGame();
 
     /**

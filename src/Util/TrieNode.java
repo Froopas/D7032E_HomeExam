@@ -3,6 +3,9 @@ package Util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Node of the Trie
+ */
 public class TrieNode {
     private final Map<Character, TrieNode> children = new HashMap<Character, TrieNode>();
     private boolean isWord;

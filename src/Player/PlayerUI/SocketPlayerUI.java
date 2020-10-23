@@ -25,7 +25,6 @@ public class SocketPlayerUI implements PlayerUI {
         try {
             this.in = new ObjectInputStream(is);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

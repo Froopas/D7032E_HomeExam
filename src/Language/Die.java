@@ -14,7 +14,7 @@ public class Die {
         this.diceArray = diceArray;
     }
 
-    public Dimension getDimenstion() {
+    public Dimension getDimension() {
         return dimension;
     }
 

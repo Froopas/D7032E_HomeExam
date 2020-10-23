@@ -1,18 +1,14 @@
 package Menu.MenuUI;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.Scanner;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+// Used for terminal Menu
 public class AsciiMenuUI implements MenuUI {
 
     private PrintStream out;
@@ -31,25 +27,6 @@ public class AsciiMenuUI implements MenuUI {
         String input = in.nextLine();
         return input;
     }
-
-    /**
-     *  if speceficOption true
-     *  {
-     *      "OptionName": {
-     *          "currentValue": "currentValue",
-     *          "Options": [ options ]
-     *      }
-     *  }
-     * 
-     *  else 
-     *  {
-     *      "OptionName": "OptionValue",
-     *      "OptionName": "OptionValue",
-     *      ...
-     *  }
-     * 
-     * 
-     */
 
     @Override
     public void renderSettings(JSONObject setting, String header) throws IOException {

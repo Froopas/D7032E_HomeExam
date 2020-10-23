@@ -18,6 +18,9 @@ public class Player {
 
     private boolean currentlyPlaying;
 
+    /**
+     * start the game for the player
+     */
     public void run() {
         try {
             visual.renderBoard(boggle.getBoard());
@@ -48,6 +51,10 @@ public class Player {
         }
     }
 
+    /**
+     * Sends a message to the player
+     * @param message which is sent
+     */
     public void sendMessage(String message) {
         try {
             visual.renderMessage(message);

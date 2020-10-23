@@ -84,7 +84,7 @@ public class FoggleBoggle implements BoggleMode {
         board.initialize(dieSet, seed);
     }
 
-    int calculateScore(String input) {
+    public int calculateScore(String input) {
         int length = input.replace("[^0-9]", "").length();
         if (length >= 3 && length <= 4) {
             return 1;
@@ -154,6 +154,7 @@ public class FoggleBoggle implements BoggleMode {
         String[] expressions = input.split("=");
         boolean validInput = false;
         Player pl = players.get(playerID);
+        foundOnBoard = false;
         try {
             validInput = (javaScriptEngine.eval(expressions[0]) == javaScriptEngine.eval(expressions[1]));
             validInput = validInput && !pl.isAccepted(input);
@@ -183,11 +184,17 @@ public class FoggleBoggle implements BoggleMode {
         return "NOT OK";
     }
 
-    private static int[] rowOpt = {-1,-1,-1, 0, 0, 1, 1, 1}; // all possible moves in a boggle board
+    // All possible movements from a position, x represents the move 0 is current
+    /*   x,x,x
+     *   x,0,x
+     *   x,x,x
+     */
+    private static int[] rowOpt = {-1,-1,-1, 0, 0, 1, 1, 1};
     private static int[] colOpt = {-1, 0, 1,-1, 1,-1, 0, 1};
 
     private boolean foundOnBoard = false;
 
+    // Helper function for looking through the board
     private boolean searchBoard(String input, int x, int y, int matches, boolean[][] processed) {
         if (matches >= input.length()) {
             foundOnBoard = true;
@@ -211,6 +218,7 @@ public class FoggleBoggle implements BoggleMode {
         return false;
     }
 
+    // checks if the position x,y is within the board and if the position have been processed
     private boolean isValid(int x, int y, boolean[][] processed) {
         return  (x >= 0 && x < board.getDimension().getX()) &&
                 (y >= 0 && y < board.getDimension().getY()) &&

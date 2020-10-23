@@ -19,10 +19,13 @@ public class BattleBoggle extends StandardBoggle {
 
     @Override
     public String checkInput(String input, int playerID) {
+        // Use the standard boggle check input
         String check = super.checkInput(input, playerID);
         if (check.equals("OK")) {
             if(battleWords.contains(input)) {
                 Player player = players.get(playerID);
+                // As standard boggles check input adds the score if it is correct
+                // we need to remove the score since the input was "falsely" accepted
                 player.setScore(player.getScore() - calculateScore(input));
                 return "This word has already been submitted";
             } else {

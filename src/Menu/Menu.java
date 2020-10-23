@@ -15,6 +15,11 @@ public class Menu {
 
     private MenuUI visual;
 
+    /**
+     * Run the menu
+     * @param baseSetting the default setting for the game
+     * @return setting for the gamemode which was choosen through the menu
+     */
     public JSONObject run(JSONObject baseSetting) {
         boolean shouldExit = false;
 
@@ -87,6 +92,7 @@ public class Menu {
         return returnSetting;
     }
 
+    // Helper menu for gamemode selection
     private String gamemodeMenu(JSONObject base, ArrayList<String> gameModes) {
         while(true) {
             JSONObject opt = new JSONObject();
@@ -108,6 +114,7 @@ public class Menu {
         }
     }
 
+    // helper menu for language selection
     private JSONObject languageMenu(JSONObject base) {
         JSONObject lang = base.getJSONObject("language");
         try {

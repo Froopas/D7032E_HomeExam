@@ -1,5 +1,9 @@
 package Util;
 
+/**
+ * This class is for fast search through a list of words.
+ * Used for the dictionary
+ */
 public class Trie {
     private TrieNode root;
 
