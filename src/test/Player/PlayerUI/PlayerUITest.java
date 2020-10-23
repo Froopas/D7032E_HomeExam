@@ -8,17 +8,16 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-import Player.PlayerUI.AsciiPlayerUI;
+import Player.PlayerUI.TerminalPlayerUI;
 
 public class PlayerUITest {
 
     @Test
     public void testInput() {
-        AsciiPlayerUI playerUi = new AsciiPlayerUI();
+        TerminalPlayerUI playerUi = new TerminalPlayerUI();
         String expected = "testar 1.2.3...";
 
         InputStream is = new ByteArrayInputStream(expected.getBytes());
-        playerUi.setInputStream(is);
         String value = "";
         try {
             value =  playerUi.getInput();

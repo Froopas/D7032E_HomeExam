@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AsciiMenuUI.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">Menu.MenuUI</a> &gt; <span class="el_source">AsciiMenuUI.java</span></div><h1>AsciiMenuUI.java</h1><pre class="source lang-java linenums">package Menu.MenuUI;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Scanner;
+import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+<span class="nc" id="L16">public class AsciiMenuUI implements MenuUI {</span>
+
+    private PrintStream out;
+    private Scanner in;
+
+    public void setOutputStream(PrintStream os) {
+<span class="nc" id="L22">        this.out = os;</span>
+<span class="nc" id="L23">    }</span>
+
+    public void setInputStream(InputStream is) {
+<span class="nc" id="L26">        this.in = new Scanner(is);</span>
+<span class="nc" id="L27">    }</span>
+
+    @Override
+    public String getInput() throws IOException {
+<span class="nc" id="L31">        String input = in.nextLine();</span>
+<span class="nc" id="L32">        return input;</span>
+    }
+
+    /**
+     *  if speceficOption true
+     *  {
+     *      &quot;OptionName&quot;: {
+     *          &quot;currentValue&quot;: &quot;currentValue&quot;,
+     *          &quot;Options&quot;: [ options ]
+     *      }
+     *  }
+     * 
+     *  else 
+     *  {
+     *      &quot;OptionName&quot;: &quot;OptionValue&quot;,
+     *      &quot;OptionName&quot;: &quot;OptionValue&quot;,
+     *      ...
+     *  }
+     * 
+     * 
+     */
+
+    @Override
+    public void renderSettings(JSONObject setting, String header) throws IOException {
+<span class="nc" id="L56">        String menuString = &quot;\n&quot;.concat(header).concat(&quot;\n\n&quot;);</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (header.equals(&quot;Setting&quot;)) {</span>
+<span class="nc" id="L58">            menuString = menuString.concat(&quot;GameMode: &quot;).concat(setting.getString(&quot;gamemode&quot;)).concat(&quot;\n&quot;);</span>
+<span class="nc" id="L59">            menuString = menuString.concat(&quot;Language: &quot;).concat(setting.getJSONObject(&quot;language&quot;).getString(&quot;name&quot;)).concat(&quot;\n&quot;);</span>
+<span class="nc" id="L60">            menuString = menuString.concat(&quot;\t  BoardSize: &quot;).concat(setting.getJSONObject(&quot;language&quot;).getString(&quot;size&quot;)).concat(&quot; (depends on Language)\n&quot;);</span>
+<span class="nc" id="L61">            menuString = menuString.concat(&quot;\t  Dictionary: &quot;).concat(setting.getJSONObject(&quot;language&quot;).getString(&quot;dictionary&quot;)).concat(&quot; (depends on Language)\n&quot;);</span>
+<span class="nc" id="L62">            menuString = menuString.concat(&quot;Show Solution: &quot;).concat(String.valueOf(setting.getBoolean(&quot;showSolution&quot;))).concat(&quot;\n&quot;);</span>
+<span class="nc" id="L63">            menuString = menuString.concat(&quot;Number of Players: &quot;).concat(String.valueOf(setting.getInt(&quot;numberOfPlayers&quot;))).concat(&quot;\n&quot;);</span>
+<span class="nc" id="L64">            menuString = menuString.concat(&quot;Time to Play: &quot;).concat(String.valueOf(setting.getInt(&quot;gameTime&quot;))).concat(&quot; seconds\n&quot;);</span>
+<span class="nc" id="L65">            menuString = menuString.concat(&quot;Generous Boggle: &quot;).concat(String.valueOf(setting.getBoolean(&quot;generousBoggle&quot;))).concat(&quot;\n&quot;);</span>
+
+<span class="nc bnc" id="L67" title="All 8 branches missed.">        } else if (header.equals(&quot;GameMode&quot;) || header.equals(&quot;Language&quot;) || header.equals(&quot;Size&quot;) || header.equals(&quot;Dictionary&quot;)) {</span>
+<span class="nc" id="L68">            menuString = menuString.concat(&quot;Current &quot;).concat(header).concat(&quot;: &quot;).concat(setting.getString(&quot;value&quot;)).concat(&quot;\n&quot;);</span>
+<span class="nc" id="L69">            menuString = menuString.concat(&quot;Available &quot;).concat(header).concat(&quot;s: [&quot;);</span>
+<span class="nc" id="L70">            JSONArray options = setting.getJSONArray(&quot;options&quot;);</span>
+<span class="nc" id="L71">            menuString = menuString.concat(options.getString(0));</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">            for (int i=1; i&lt; options.length(); i++) {</span>
+<span class="nc" id="L73">                menuString = menuString.concat(&quot;, &quot;).concat(options.getString(i));</span>
+            }
+<span class="nc" id="L75">            menuString = menuString.concat(&quot;]\n&quot;);</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        } else if (header.equals(&quot;Language Settings&quot;)) {</span>
+<span class="nc" id="L77">            menuString = menuString.concat(&quot;Language: &quot;).concat(setting.getString(&quot;name&quot;)).concat(&quot;\n&quot;);</span>
+<span class="nc" id="L78">            menuString = menuString.concat(&quot;Dictionary: &quot;).concat(setting.getString(&quot;dictionary&quot;)).concat(&quot; (depends on Language)\n&quot;);</span>
+<span class="nc" id="L79">            menuString = menuString.concat(&quot;BoardSize: &quot;).concat(setting.getString(&quot;size&quot;)).concat(&quot; (depends on Language)\n&quot;);</span>
+        }
+<span class="nc" id="L81">        out.print(menuString);</span>
+<span class="nc" id="L82">    }</span>
+
+    @Override
+    public void renderMessage(String message) throws IOException {
+<span class="nc" id="L86">        out.println(message);</span>
+
+<span class="nc" id="L88">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BoggleModeTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">test.Boggle.BoggleMode</a> &gt; <span class="el_source">BoggleModeTest.java</span></div><h1>BoggleModeTest.java</h1><pre class="source lang-java linenums">package test.Boggle.BoggleMode;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+
+import org.json.JSONObject;
+import org.junit.Test;
+
+import Boggle.Board;
+import Boggle.BoggleMode.BattleBoggle;
+import Boggle.BoggleMode.FoggleBoggle;
+import Boggle.BoggleMode.StandardBoggle;
+import Language.LanguageHandler;
+import Language.LanguageHolder;
+import Player.Player;
+import Player.PlayerUI.TerminalPlayerUI;
+
+<span class="fc" id="L23">public class BoggleModeTest {</span>
+
+    // Test of req 1 for standard
+    @Test(expected = Exception.class)
+    public void standardBoggle1p() throws Exception {
+<span class="fc" id="L28">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L29">        JSONObject json = boggle.getSettings();</span>
+<span class="fc" id="L30">        json.put(&quot;numberOfPlayers&quot;, 1);</span>
+<span class="nc" id="L31">        boggle.initialize(json);</span>
+<span class="nc" id="L32">    }</span>
+
+    // Test of req 1 for standard
+    @Test(expected = Exception.class)
+    public void battleBoggle1p() throws Exception {
+<span class="fc" id="L37">        BattleBoggle boggle = new BattleBoggle();</span>
+<span class="fc" id="L38">        JSONObject json = boggle.getSettings();</span>
+<span class="fc" id="L39">        json.put(&quot;numberOfPlayers&quot;, 1);</span>
+<span class="nc" id="L40">        boggle.initialize(json);</span>
+<span class="nc" id="L41">    }</span>
+
+    // Test of req 1 for standard
+    @Test(expected = Exception.class)
+    public void foggleBoggle1p() throws Exception {
+<span class="fc" id="L46">        FoggleBoggle boggle = new FoggleBoggle();</span>
+<span class="fc" id="L47">        JSONObject json = boggle.getSettings();</span>
+<span class="fc" id="L48">        json.put(&quot;numberOfPlayers&quot;, 1);</span>
+<span class="nc" id="L49">        boggle.initialize(json);</span>
+<span class="nc" id="L50">    }</span>
+    
+    // Test of rule 2
+    @Test
+    public void foggleBoggleBoardTest() {
+<span class="fc" id="L55">        FoggleBoggle boggle = new FoggleBoggle();</span>
+<span class="fc" id="L56">        JSONObject json = boggle.getSettings();</span>
+<span class="fc" id="L57">        long seed = 12345L;</span>
+<span class="fc" id="L58">        json.put(&quot;seed&quot;, seed);</span>
+        try { 
+<span class="fc" id="L60">            boggle.initialize(json);</span>
+<span class="nc" id="L61">        } catch (Exception e) {</span>
+<span class="nc" id="L62">            e.printStackTrace();</span>
+<span class="fc" id="L63">        }</span>
+<span class="fc" id="L64">        Board board1 = boggle.getBoard();</span>
+<span class="fc" id="L65">        json.put(&quot;seed&quot;, seed + 12345L);</span>
+        try { 
+<span class="fc" id="L67">            boggle.initialize(json);</span>
+<span class="nc" id="L68">        } catch (Exception e) {</span>
+<span class="nc" id="L69">            e.printStackTrace();</span>
+<span class="fc" id="L70">        }</span>
+<span class="fc" id="L71">        Board board2 = boggle.getBoard();</span>
+<span class="fc" id="L72">        boolean boardSame = true;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        for (int y = 0; y &lt; board1.getDimension().getY(); y++) {</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            for( int x = 0; x &lt; board1.getDimension().getX(); x++) {</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">                if(!board1.getBoard(x, y).equals(board2.getBoard(x, y))) {</span>
+<span class="fc" id="L76">                    boardSame = false;</span>
+                }
+            }
+        }
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        assertTrue(!boardSame);</span>
+<span class="fc" id="L81">    }</span>
+
+    // Test of rule 4
+    @Test
+    public void winnerAnnouncedTest() {
+<span class="fc" id="L86">        Player pl1 = new Player();</span>
+<span class="fc" id="L87">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L88">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L89">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L90">        ui1.setOutputStream(ps);</span>
+<span class="fc" id="L91">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L92">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L93">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L94">        setting.put(&quot;seed&quot;, 1234);</span>
+        try {
+<span class="fc" id="L96">            boggle.initialize(setting);</span>
+<span class="nc" id="L97">        } catch (Exception e) {</span>
+
+<span class="fc" id="L99">        }</span>
+<span class="fc" id="L100">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L102">        boggle.addPlayer(pl1);</span>
+<span class="fc" id="L103">        boggle.checkInput(&quot;MIRK&quot;,0);</span>
+<span class="fc" id="L104">        boggle.finnishGame();</span>
+<span class="fc" id="L105">        String output = baos.toString();</span>
+<span class="fc" id="L106">        boolean announced = output.contains(&quot;The winner of this game is player 0 with a score of 1&quot;);</span>
+<span class="fc" id="L107">        assertTrue(announced);</span>
+<span class="fc" id="L108">    }</span>
+
+    // Test of rule 5
+    @Test
+    public void pointsTest() {
+<span class="fc" id="L113">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L114">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L115">        setting.put(&quot;seed&quot;, 123456);</span>
+        try {
+<span class="fc" id="L117">            boggle.initialize(setting);</span>
+<span class="nc" id="L118">        } catch (Exception e) {</span>
+
+<span class="fc" id="L120">        }</span>
+<span class="fc" id="L121">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L123">        ArrayList&lt;String&gt; words = boggle.getAllWords();</span>
+<span class="fc" id="L124">        int testLength = 2;</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        for(String word: words) {</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            if(word.length() == testLength) {</span>
+<span class="fc" id="L127">                int check = boggle.calculateScore(word);</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">                if (testLength &lt; 3) {</span>
+<span class="fc" id="L129">                    assertEquals(check, 0);</span>
+<span class="fc bfc" id="L130" title="All 4 branches covered.">                } else if (testLength == 3 || testLength == 4) {</span>
+<span class="fc" id="L131">                    assertEquals(check, 1);</span>
+<span class="pc bpc" id="L132" title="2 of 4 branches missed.">                } else if (testLength &gt; 4 &amp;&amp; testLength &lt; 7) {</span>
+<span class="fc" id="L133">                    assertEquals(check, testLength - 3);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">                } else if (testLength == 7) {</span>
+<span class="nc" id="L135">                    assertEquals(check, 5);</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">                } else  if (testLength &gt; 7) {</span>
+<span class="nc" id="L137">                    assertEquals(check, 11);</span>
+                }
+<span class="fc" id="L139">                testLength++;</span>
+            }
+<span class="fc" id="L141">        }</span>
+<span class="fc" id="L142">    }</span>
+
+    // Test of rule 6
+    @Test
+    public void quTest() {
+<span class="fc" id="L147">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L148">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L149">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L150">        setting.put(&quot;seed&quot;, seed);</span>
+        try {
+<span class="fc" id="L152">            boggle.initialize(setting);</span>
+<span class="nc" id="L153">        } catch (Exception e) {</span>
+
+<span class="fc" id="L155">        }</span>
+<span class="fc" id="L156">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L158">        ArrayList&lt;String&gt; words = boggle.getAllWords();</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">        for (String word: words) {</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">            if(word.contains(&quot;QU&quot;)) {</span>
+<span class="fc" id="L161">                &quot;Test&quot;.toString();</span>
+            }
+<span class="fc" id="L163">        }</span>
+
+<span class="fc" id="L165">        int check = boggle.calculateScore(&quot;SQUILLA&quot;);</span>
+<span class="fc" id="L166">        assertEquals(check,5);</span>
+<span class="fc" id="L167">        &quot;hej&quot;.toString();</span>
+<span class="fc" id="L168">    }</span>
+
+    // Test of rule 7
+    @Test
+    public void multipleOfSameStandardTest() {
+<span class="fc" id="L173">        Player pl1 = new Player();</span>
+<span class="fc" id="L174">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L175">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L176">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L177">        ui1.setOutputStream(ps);</span>
+<span class="fc" id="L178">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L179">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L180">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L181">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L182">        setting.put(&quot;seed&quot;, seed);</span>
+        try {
+<span class="fc" id="L184">            boggle.initialize(setting);</span>
+<span class="nc" id="L185">        } catch (Exception e) {</span>
+
+<span class="fc" id="L187">        }</span>
+<span class="fc" id="L188">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L190">        boggle.addPlayer(pl1);</span>
+<span class="fc" id="L191">        String check1 = boggle.checkInput(&quot;SQUILLA&quot;, 0);</span>
+<span class="fc" id="L192">        String check2 = boggle.checkInput(&quot;SQUILLA&quot;, 0);</span>
+
+<span class="fc" id="L194">        assertEquals(&quot;You have already submitted this word&quot;, check2);</span>
+
+<span class="fc" id="L196">    }</span>
+
+    // Test of rule 7 Battle Boggle (also tests rule 15)
+    @Test
+    public void multipleOfSameBattleTest() {
+<span class="fc" id="L201">        Player pl1 = new Player();</span>
+<span class="fc" id="L202">        Player pl2 = new Player();</span>
+<span class="fc" id="L203">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L204">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L205">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L206">        ui1.setOutputStream(ps);</span>
+<span class="fc" id="L207">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L208">        pl2.setPlayerUI(ui1);</span>
+<span class="fc" id="L209">        BattleBoggle boggle = new BattleBoggle();</span>
+<span class="fc" id="L210">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L211">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L212">        setting.put(&quot;seed&quot;, seed);</span>
+        try {
+<span class="fc" id="L214">            boggle.initialize(setting);</span>
+<span class="nc" id="L215">        } catch (Exception e) {</span>
+
+<span class="fc" id="L217">        }</span>
+<span class="fc" id="L218">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L220">        boggle.addPlayer(pl1);</span>
+<span class="fc" id="L221">        boggle.addPlayer(pl2);</span>
+<span class="fc" id="L222">        String check1 = boggle.checkInput(&quot;SQUILLA&quot;, 0);</span>
+<span class="fc" id="L223">        String check2 = boggle.checkInput(&quot;SQUILLA&quot;, 1);</span>
+
+<span class="fc" id="L225">        assertEquals(&quot;This word has already been submitted&quot;, check2);</span>
+<span class="fc" id="L226">    }</span>
+
+    // Test of rule 8
+    @Test
+    public void dictionaryTest() {
+<span class="fc" id="L231">        LanguageHandler langHan = LanguageHandler.getInstance();</span>
+<span class="fc" id="L232">        LanguageHolder lang = langHan.loadLanguage(&quot;English&quot;, &quot;dic&quot;, &quot;4x4&quot;);</span>
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">        assertTrue(lang.getDictionary() != null);</span>
+<span class="fc" id="L234">    }</span>
+
+    // Test of rule 9
+    @Test
+    public void possibleWordListTest() {
+<span class="fc" id="L239">        Player pl1 = new Player();</span>
+<span class="fc" id="L240">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L241">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L242">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L243">        ui1.setOutputStream(ps);</span>
+<span class="fc" id="L244">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L245">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L246">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L247">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L248">        setting.put(&quot;seed&quot;, seed);</span>
+        try {
+<span class="fc" id="L250">            boggle.initialize(setting);</span>
+<span class="nc" id="L251">        } catch (Exception e) {</span>
+
+<span class="fc" id="L253">        }</span>
+<span class="fc" id="L254">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L256">        boggle.addPlayer(pl1);</span>
+
+<span class="fc" id="L258">        boggle.finnishGame();</span>
+
+<span class="fc" id="L260">        String output = baos.toString();</span>
+
+<span class="fc" id="L262">        ArrayList&lt;String&gt; words = boggle.getAllWords();</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">        for (String word: words) {</span>
+<span class="fc" id="L264">            assertTrue(output.contains(word));</span>
+<span class="fc" id="L265">        }</span>
+<span class="fc" id="L266">    }</span>
+
+    // Test of rule 10 4x4
+    @Test
+    public void boardSize4x4Test() {
+<span class="fc" id="L271">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L272">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L273">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L274">        JSONObject language = setting.getJSONObject(&quot;language&quot;);</span>
+<span class="fc" id="L275">        language.put(&quot;size&quot;, &quot;4x4&quot;);</span>
+<span class="fc" id="L276">        setting.put(&quot;seed&quot;, seed);</span>
+        try {
+<span class="fc" id="L278">            boggle.initialize(setting);</span>
+<span class="nc" id="L279">        } catch (Exception e) {</span>
+
+<span class="fc" id="L281">        }</span>
+<span class="fc" id="L282">        Board board = boggle.getBoard();</span>
+<span class="fc" id="L283">        assertEquals(4, board.getDimension().getX());</span>
+<span class="fc" id="L284">        assertEquals(4, board.getDimension().getY());</span>
+<span class="fc" id="L285">    }</span>
+
+    // Test of rule 10 5x5
+    @Test
+    public void boardSize5x5Test() {
+<span class="fc" id="L290">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L291">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L292">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L293">        JSONObject language = setting.getJSONObject(&quot;language&quot;);</span>
+<span class="fc" id="L294">        language.put(&quot;size&quot;, &quot;5x5&quot;);</span>
+<span class="fc" id="L295">        setting.put(&quot;seed&quot;, seed);</span>
+        try {
+<span class="fc" id="L297">            boggle.initialize(setting);</span>
+<span class="nc" id="L298">        } catch (Exception e) {</span>
+
+<span class="fc" id="L300">        }</span>
+<span class="fc" id="L301">        Board board = boggle.getBoard();</span>
+<span class="fc" id="L302">        assertEquals(5, board.getDimension().getX());</span>
+<span class="fc" id="L303">        assertEquals(5, board.getDimension().getY());</span>
+<span class="fc" id="L304">    }</span>
+
+    // Test of rule 11
+    @Test
+    public void languageDiceTest() {
+<span class="fc" id="L309">        LanguageHandler langHan = LanguageHandler.getInstance();</span>
+<span class="fc" id="L310">        LanguageHolder spanish = langHan.loadLanguage(&quot;Spanish&quot;, &quot;DictButSpanish&quot;, &quot;4x4&quot;);</span>
+<span class="fc" id="L311">        LanguageHolder english = langHan.loadLanguage(&quot;English&quot;, &quot;dic&quot;, &quot;4x4&quot;);</span>
+<span class="fc" id="L312">        ArrayList&lt;ArrayList&lt;String&gt;&gt; spanDie = spanish.getDice().getDiceArray();</span>
+<span class="fc" id="L313">        ArrayList&lt;ArrayList&lt;String&gt;&gt; engDie = english.getDice().getDiceArray();</span>
+<span class="fc" id="L314">        boolean same = true;</span>
+<span class="pc bpc" id="L315" title="1 of 2 branches missed.">        if(spanDie.size()!=engDie.size()) {</span>
+<span class="nc" id="L316">            fail();</span>
+        }
+<span class="fc bfc" id="L318" title="All 2 branches covered.">        for (int i=0; i &lt; spanDie.size(); i++) {</span>
+<span class="pc bpc" id="L319" title="1 of 2 branches missed.">            if (spanDie.get(i).size()!=engDie.get(i).size()) {</span>
+<span class="nc" id="L320">                fail();</span>
+            }
+<span class="fc bfc" id="L322" title="All 2 branches covered.">            for (int j=0; j &lt; spanDie.get(i).size(); j++) {</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">                if(!spanDie.get(i).get(j).equals(engDie.get(i).get(j))) {</span>
+<span class="fc" id="L324">                    same = false;</span>
+                }
+            }
+        }
+<span class="pc bpc" id="L328" title="1 of 2 branches missed.">        assertTrue(!same);</span>
+<span class="fc" id="L329">    }</span>
+
+    // Test of rule 12
+    @Test
+    public void standardBoggleChainTest() {
+<span class="fc" id="L334">        Player pl1 = new Player();</span>
+<span class="fc" id="L335">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L336">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L337">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L338">        ui1.setOutputStream(System.out);</span>
+<span class="fc" id="L339">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L340">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L341">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L342">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L343">        setting.put(&quot;seed&quot;, seed);</span>
+        try {
+<span class="fc" id="L345">            boggle.initialize(setting);</span>
+<span class="nc" id="L346">        } catch (Exception e) {</span>
+
+<span class="fc" id="L348">        }</span>
+<span class="fc" id="L349">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L351">        boggle.addPlayer(pl1);</span>
+        try {
+<span class="fc" id="L353">            ui1.renderBoard(boggle.getBoard());</span>
+<span class="nc" id="L354">        } catch (Exception e) {</span>
+
+<span class="fc" id="L356">        }</span>
+<span class="fc" id="L357">        String check = boggle.checkInput(&quot;SAGES&quot;, 0); // SAGES uses s twice </span>
+
+<span class="fc" id="L359">        assertEquals(&quot;Not on Board&quot;, check);</span>
+<span class="fc" id="L360">    }</span>
+
+    // Test of rule 13 
+    @Test
+    public void standardBoggleGenerousChainTest() {
+<span class="fc" id="L365">        Player pl1 = new Player();</span>
+<span class="fc" id="L366">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L367">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L368">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L369">        ui1.setOutputStream(System.out);</span>
+<span class="fc" id="L370">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L371">        StandardBoggle boggle = new StandardBoggle();</span>
+<span class="fc" id="L372">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L373">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L374">        setting.put(&quot;seed&quot;, seed);</span>
+<span class="fc" id="L375">        setting.put(&quot;generousBoggle&quot;, true);</span>
+        try {
+<span class="fc" id="L377">            boggle.initialize(setting);</span>
+<span class="nc" id="L378">        } catch (Exception e) {</span>
+
+<span class="fc" id="L380">        }</span>
+<span class="fc" id="L381">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L383">        boggle.addPlayer(pl1);</span>
+        try {
+<span class="fc" id="L385">            ui1.renderBoard(boggle.getBoard());</span>
+<span class="nc" id="L386">        } catch (Exception e) {</span>
+
+<span class="fc" id="L388">        }</span>
+<span class="fc" id="L389">        String check = boggle.checkInput(&quot;SAGES&quot;, 0); // SAGES uses s twice </span>
+
+<span class="fc" id="L391">        assertEquals(&quot;OK&quot;, check);</span>
+<span class="fc" id="L392">    }</span>
+
+    // Test of rule 14 battle
+    @Test
+    public void battleBoggleGenerousChainTest() {
+<span class="fc" id="L397">        Player pl1 = new Player();</span>
+<span class="fc" id="L398">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L399">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L400">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L401">        ui1.setOutputStream(System.out);</span>
+<span class="fc" id="L402">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L403">        BattleBoggle boggle = new BattleBoggle();</span>
+<span class="fc" id="L404">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L405">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L406">        setting.put(&quot;seed&quot;, seed);</span>
+<span class="fc" id="L407">        setting.put(&quot;generousBoggle&quot;, true);</span>
+        try {
+<span class="fc" id="L409">            boggle.initialize(setting);</span>
+<span class="nc" id="L410">        } catch (Exception e) {</span>
+
+<span class="fc" id="L412">        }</span>
+<span class="fc" id="L413">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L415">        boggle.addPlayer(pl1);</span>
+        try {
+<span class="fc" id="L417">            ui1.renderBoard(boggle.getBoard());</span>
+<span class="nc" id="L418">        } catch (Exception e) {</span>
+
+<span class="fc" id="L420">        }</span>
+<span class="fc" id="L421">        String check = boggle.checkInput(&quot;SAGES&quot;, 0); // SAGES uses s twice </span>
+
+<span class="fc" id="L423">        assertEquals(&quot;OK&quot;, check);</span>
+<span class="fc" id="L424">    }</span>
+
+    // Test of rule 14 foggle
+    @Test
+    public void foggleBoggleGenerousChainTest() {
+<span class="fc" id="L429">        Player pl1 = new Player();</span>
+<span class="fc" id="L430">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L431">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L432">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L433">        ui1.setOutputStream(System.out);</span>
+<span class="fc" id="L434">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L435">        FoggleBoggle boggle = new FoggleBoggle();</span>
+<span class="fc" id="L436">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L437">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L438">        setting.put(&quot;seed&quot;, seed);</span>
+<span class="fc" id="L439">        setting.put(&quot;generousBoggle&quot;, true);</span>
+        try {
+<span class="fc" id="L441">            boggle.initialize(setting);</span>
+<span class="nc" id="L442">        } catch (Exception e) {</span>
+
+<span class="fc" id="L444">        }</span>
+
+<span class="fc" id="L446">        boggle.addPlayer(pl1);</span>
+        try {
+<span class="fc" id="L448">            ui1.renderBoard(boggle.getBoard());</span>
+<span class="nc" id="L449">        } catch (Exception e) {</span>
+
+<span class="fc" id="L451">        }</span>
+<span class="fc" id="L452">        String check = boggle.checkInput(&quot;1+6=2+7-2&quot;, 0); // uses the same 2 twice </span>
+
+<span class="fc" id="L454">        assertEquals(&quot;OK&quot;, check);</span>
+<span class="fc" id="L455">    }</span>
+
+    // Test of rule 16
+    @Test
+    public void battleBoggleAnnounceTest() {
+<span class="fc" id="L460">        Player pl1 = new Player();</span>
+<span class="fc" id="L461">        Player pl2 = new Player();</span>
+<span class="fc" id="L462">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L463">        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();</span>
+<span class="fc" id="L464">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L465">        TerminalPlayerUI ui2 = new TerminalPlayerUI();</span>
+<span class="fc" id="L466">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L467">        PrintStream ps2 = new PrintStream(baos2);</span>
+<span class="fc" id="L468">        ui1.setOutputStream(ps);</span>
+<span class="fc" id="L469">        ui2.setOutputStream(ps2);</span>
+<span class="fc" id="L470">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L471">        pl2.setPlayerUI(ui2);</span>
+<span class="fc" id="L472">        pl2.setPlayerID(1);</span>
+<span class="fc" id="L473">        BattleBoggle boggle = new BattleBoggle();</span>
+<span class="fc" id="L474">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L475">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L476">        setting.put(&quot;seed&quot;, seed);</span>
+        try {
+<span class="fc" id="L478">            boggle.initialize(setting);</span>
+<span class="nc" id="L479">        } catch (Exception e) {</span>
+
+<span class="fc" id="L481">        }</span>
+<span class="fc" id="L482">        boggle.searchAllWords();</span>
+
+<span class="fc" id="L484">        boggle.addPlayer(pl1);</span>
+<span class="fc" id="L485">        boggle.addPlayer(pl2);</span>
+<span class="fc" id="L486">        String check1 = boggle.checkInput(&quot;SQUILLA&quot;, 0);</span>
+
+<span class="fc" id="L488">        String out2 = baos2.toString();</span>
+
+<span class="fc" id="L490">        assertTrue(out2.contains(&quot;Player 0 submitted word SQUILLA&quot;));</span>
+<span class="fc" id="L491">    }</span>
+
+    // Test of rule 17
+    @Test
+    public void foggleMathEquationsTest() {
+<span class="fc" id="L496">        Player pl1 = new Player();</span>
+<span class="fc" id="L497">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span>
+<span class="fc" id="L498">        TerminalPlayerUI ui1 = new TerminalPlayerUI();</span>
+<span class="fc" id="L499">        PrintStream ps = new PrintStream(baos);</span>
+<span class="fc" id="L500">        ui1.setOutputStream(System.out);</span>
+<span class="fc" id="L501">        pl1.setPlayerUI(ui1);</span>
+<span class="fc" id="L502">        FoggleBoggle boggle = new FoggleBoggle();</span>
+<span class="fc" id="L503">        JSONObject setting = boggle.getSettings();</span>
+<span class="fc" id="L504">        long seed = 1603459526904L; // Seed that contains Qu</span>
+<span class="fc" id="L505">        setting.put(&quot;seed&quot;, seed);</span>
+<span class="fc" id="L506">        setting.put(&quot;generousBoggle&quot;, true);</span>
+        try {
+<span class="fc" id="L508">            boggle.initialize(setting);</span>
+<span class="nc" id="L509">        } catch (Exception e) {</span>
+
+<span class="fc" id="L511">        }</span>
+
+<span class="fc" id="L513">        boggle.addPlayer(pl1);</span>
+        try {
+<span class="fc" id="L515">            ui1.renderBoard(boggle.getBoard());</span>
+<span class="nc" id="L516">        } catch (Exception e) {</span>
+
+<span class="fc" id="L518">        }</span>
+<span class="fc" id="L519">        String check = boggle.checkInput(&quot;4+6=4+3&quot;, 0); // uses the same 2 twice </span>
+
+<span class="fc" id="L521">        assertEquals(&quot;NOT OK&quot;, check);</span>
+<span class="fc" id="L522">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

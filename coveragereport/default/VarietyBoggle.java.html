@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VarietyBoggle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">VarietyBoggle.java</span></div><h1>VarietyBoggle.java</h1><pre class="source lang-java linenums">import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.json.JSONObject;
+
+import Boggle.BoggleFactory;
+import Boggle.BoggleMode.BoggleMode;
+import Boggle.BoggleMode.StandardBoggle;
+import Menu.Menu;
+import Menu.MenuUI.AsciiMenuUI;
+import Menu.MenuUI.MenuUI;
+import Player.Player;
+import Player.PlayerUI.TerminalPlayerUI;
+import Player.PlayerUI.SocketPlayerUI;
+
+<span class="nc" id="L21">public class VarietyBoggle {</span>
+
+    private static final long STARTUP_TIME = 10;
+
+    BoggleMode boggle;
+
+    ServerSocket aSocket;
+<span class="nc" id="L28">    ArrayList&lt;Socket&gt; sockets = new ArrayList&lt;Socket&gt;();</span>
+
+    public void run() {
+        // run menu
+        // get settings from menu
+<span class="nc" id="L33">        JSONObject setting = BoggleFactory.getDefaultSettings(&quot;StandardBoggle&quot;);</span>
+
+        while (true) {
+<span class="nc" id="L36">            AsciiMenuUI menuUi = new AsciiMenuUI();</span>
+<span class="nc" id="L37">            menuUi.setInputStream(System.in);</span>
+<span class="nc" id="L38">            menuUi.setOutputStream(System.out);</span>
+<span class="nc" id="L39">            Menu menu = new Menu();</span>
+<span class="nc" id="L40">            menu.setVisual(menuUi);</span>
+<span class="nc" id="L41">            setting = menu.run(setting);</span>
+
+<span class="nc bnc" id="L43" title="All 2 branches missed.">            if(setting == null) {</span>
+<span class="nc" id="L44">                break;</span>
+            }
+            
+<span class="nc" id="L47">            boggle = BoggleFactory.getGameMode(setting.getString(&quot;gamemode&quot;));</span>
+
+            try {
+<span class="nc" id="L50">                boggle.initialize(setting);</span>
+<span class="nc" id="L51">            } catch (Exception e) {</span>
+<span class="nc" id="L52">                e.printStackTrace();</span>
+<span class="nc" id="L53">            }</span>
+
+<span class="nc" id="L55">            int numberOfPlayers = setting.getInt(&quot;numberOfPlayers&quot;);</span>
+<span class="nc" id="L56">            prepareGame(setting.getString(&quot;gamemode&quot;), numberOfPlayers);</span>
+
+<span class="nc" id="L58">            boggle.startGame();</span>
+
+<span class="nc" id="L60">            playGame(numberOfPlayers, setting.getInt(&quot;gameTime&quot;));</span>
+
+<span class="nc" id="L62">            boggle.finnishGame();</span>
+<span class="nc" id="L63">            boggle.broadcastMessage(&quot;CLOSE SOCKET&quot;, 0);</span>
+
+            try {
+<span class="nc bnc" id="L66" title="All 2 branches missed.">                for (Socket socket: sockets) {</span>
+<span class="nc" id="L67">                    socket.close();</span>
+<span class="nc" id="L68">                }</span>
+<span class="nc" id="L69">                aSocket.close();</span>
+<span class="nc" id="L70">            } catch (IOException e) {</span>
+<span class="nc" id="L71">                e.printStackTrace();</span>
+<span class="nc" id="L72">            }</span>
+<span class="nc" id="L73">        }</span>
+
+<span class="nc" id="L75">    }</span>
+
+    public void prepareGame(String gamemode, int numberOfPlayers) {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (!gamemode.equals(&quot;FoggleBoggle&quot;)) {</span>
+<span class="nc" id="L79">            ExecutorService startup = Executors.newFixedThreadPool(2);</span>
+<span class="nc" id="L80">            Runnable serverSetup = new Runnable() {</span>
+    
+                @Override
+                public void run() {
+<span class="nc" id="L84">                    server(numberOfPlayers);</span>
+<span class="nc" id="L85">                    System.out.println(&quot;Server setup done&quot;);</span>
+<span class="nc" id="L86">                }</span>
+    
+            };
+    
+<span class="nc" id="L90">            Runnable boggleSetup = new Runnable() {</span>
+                @Override
+                public void run() {
+<span class="nc" id="L93">                   ((StandardBoggle)boggle).searchAllWords();</span>
+<span class="nc" id="L94">                   System.out.println(&quot;Search done&quot;);</span>
+<span class="nc" id="L95">                }</span>
+            };
+<span class="nc" id="L97">            startup.execute(serverSetup);</span>
+<span class="nc" id="L98">            startup.execute(boggleSetup);</span>
+
+            try {
+<span class="nc" id="L101">                startup.awaitTermination(STARTUP_TIME, TimeUnit.SECONDS);</span>
+<span class="nc" id="L102">                startup.shutdownNow();</span>
+<span class="nc" id="L103">            } catch (Exception e) {</span>
+<span class="nc" id="L104">                e.printStackTrace();</span>
+<span class="nc" id="L105">            }</span>
+<span class="nc" id="L106">        } else {</span>
+<span class="nc" id="L107">            server(numberOfPlayers);</span>
+        }
+<span class="nc" id="L109">    }</span>
+
+    public void playGame(int numberOfPlayers, int gameTime) {
+<span class="nc" id="L112">        ExecutorService playThreads = Executors.newFixedThreadPool(numberOfPlayers);</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        for(Player pl:boggle.getPlayers()) {</span>
+<span class="nc" id="L114">            Runnable task = new Runnable() {</span>
+                @Override
+                public void run() {
+<span class="nc" id="L117">                    pl.run();</span>
+<span class="nc" id="L118">                }</span>
+            };
+<span class="nc" id="L120">            playThreads.execute(task);</span>
+<span class="nc" id="L121">        }</span>
+        try {
+<span class="nc" id="L123">            playThreads.awaitTermination(gameTime, TimeUnit.SECONDS);</span>
+<span class="nc" id="L124">            playThreads.shutdownNow();</span>
+<span class="nc" id="L125">        } catch (Exception e) {</span>
+<span class="nc" id="L126">            e.printStackTrace();</span>
+<span class="nc" id="L127">        }</span>
+<span class="nc" id="L128">    }</span>
+
+    public void server(int numberOfPlayers) {
+<span class="nc" id="L131">        boggle.addPlayer(createLocalPlayer());</span>
+        try {
+<span class="nc" id="L133">            aSocket = new ServerSocket(2048);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">            for (int i = 1; i &lt; numberOfPlayers; i++) {</span>
+<span class="nc" id="L135">                Socket connSocket = aSocket.accept();</span>
+<span class="nc" id="L136">                boggle.addPlayer(createRemotePlayer(connSocket, i, numberOfPlayers));</span>
+            }
+<span class="nc" id="L138">            boggle.broadcastMessage(&quot;All players have joined&quot;, -1);</span>
+<span class="nc" id="L139">        } catch (Exception e) {</span>
+<span class="nc" id="L140">            e.printStackTrace();</span>
+<span class="nc" id="L141">        }</span>
+<span class="nc" id="L142">    }</span>
+
+    private Player createLocalPlayer() {
+<span class="nc" id="L145">        TerminalPlayerUI pUi = new TerminalPlayerUI();</span>
+<span class="nc" id="L146">        pUi.setInputStream(System.in);</span>
+<span class="nc" id="L147">        pUi.setOutputStream(System.out);</span>
+<span class="nc" id="L148">        Player locPlayer = new Player();</span>
+<span class="nc" id="L149">        locPlayer.setPlayerUI(pUi);</span>
+<span class="nc" id="L150">        locPlayer.setPlayerID(0);</span>
+<span class="nc" id="L151">        locPlayer.setBoggleMode(boggle);</span>
+<span class="nc" id="L152">        locPlayer.sendMessage(&quot;You are player 0\n&quot;);</span>
+<span class="nc" id="L153">        return locPlayer;</span>
+    }
+ 
+    private Player createRemotePlayer(Socket sock, int playerID, int numOfPlayer) throws IOException {
+<span class="nc" id="L157">        SocketPlayerUI pUi = new SocketPlayerUI();</span>
+<span class="nc" id="L158">        sockets.add(sock);</span>
+<span class="nc" id="L159">        pUi.setInputStream(sock.getInputStream());</span>
+<span class="nc" id="L160">        pUi.setOutputStream(sock.getOutputStream());</span>
+<span class="nc" id="L161">        Player remPlayer = new Player();</span>
+<span class="nc" id="L162">        remPlayer.setPlayerUI(pUi);</span>
+<span class="nc" id="L163">        remPlayer.setPlayerID(playerID);</span>
+<span class="nc" id="L164">        remPlayer.setBoggleMode(boggle);</span>
+<span class="nc" id="L165">        remPlayer.sendMessage(String.format(&quot;You are player %d \n&quot;, playerID));</span>
+<span class="nc" id="L166">        boggle.broadcastMessage(String.format(&quot;Waiting for players... \t %d/%d\n&quot;, playerID,numOfPlayer), -1);</span>
+<span class="nc" id="L167">        return remPlayer;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

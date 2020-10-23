@@ -14,14 +14,14 @@ public class StandardBoggleTest {
     public void standardBoggleInitializeTest() {
         StandardBoggle boggle = new StandardBoggle();
         JSONObject json = boggle.getSettings();
-        json.put("seed", 1234);
+        json.put("seed", 0);
         json.put("generousBoggle", false);
+        Long start = System.currentTimeMillis();
         try {
             boggle.initialize(json);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Long start = System.currentTimeMillis();
         boggle.searchAllWords();
         Long fin = System.currentTimeMillis() - start;
         "hej".toString();

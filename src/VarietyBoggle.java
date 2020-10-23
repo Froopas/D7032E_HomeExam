@@ -1,56 +1,88 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
+import Boggle.BoggleFactory;
 import Boggle.BoggleMode.BoggleMode;
 import Boggle.BoggleMode.StandardBoggle;
+import Menu.Menu;
+import Menu.MenuUI.AsciiMenuUI;
+import Menu.MenuUI.MenuUI;
 import Player.Player;
-import Player.PlayerUI.AsciiPlayerUI;
+import Player.PlayerUI.TerminalPlayerUI;
+import Player.PlayerUI.SocketPlayerUI;
 
 public class VarietyBoggle {
 
-    private static final long STARTUP_TIME = 3;
+    private static final long STARTUP_TIME = 10;
 
     BoggleMode boggle;
 
     ServerSocket aSocket;
+    ArrayList<Socket> sockets = new ArrayList<Socket>();
 
     public void run() {
         // run menu
         // get settings from menu
-        boggle = new StandardBoggle();
-        
-        JSONObject setting = boggle.getSettings();
-        try {
-            boggle.initialize(setting);
-        } catch (Exception e) {
-            e.printStackTrace();
+        JSONObject setting = BoggleFactory.getDefaultSettings("StandardBoggle");
+
+        while (true) {
+            AsciiMenuUI menuUi = new AsciiMenuUI();
+            menuUi.setInputStream(System.in);
+            menuUi.setOutputStream(System.out);
+            Menu menu = new Menu();
+            menu.setVisual(menuUi);
+            setting = menu.run(setting);
+
+            if(setting == null) {
+                break;
+            }
+            
+            boggle = BoggleFactory.getGameMode(setting.getString("gamemode"));
+
+            try {
+                boggle.initialize(setting);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            int numberOfPlayers = setting.getInt("numberOfPlayers");
+            prepareGame(setting.getString("gamemode"), numberOfPlayers);
+
+            boggle.startGame();
+
+            playGame(numberOfPlayers, setting.getInt("gameTime"));
+
+            boggle.finnishGame();
+            boggle.broadcastMessage("CLOSE SOCKET", 0);
+
+            try {
+                for (Socket socket: sockets) {
+                    socket.close();
+                }
+                aSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
-        int numberOfPlayers = setting.getInt("numberOfPlayers");
-        prepareGame(setting.getString("gamemode"), numberOfPlayers);
-
-        boggle.startGame();
-
-        playGame(numberOfPlayers, setting.getInt("gameTime"));
-
-        boggle.finnishGame();
 
     }
 
     public void prepareGame(String gamemode, int numberOfPlayers) {
-        if (gamemode.equals("foggle")) {
+        if (!gamemode.equals("FoggleBoggle")) {
             ExecutorService startup = Executors.newFixedThreadPool(2);
             Runnable serverSetup = new Runnable() {
     
                 @Override
                 public void run() {
                     server(numberOfPlayers);
+                    System.out.println("Server setup done");
                 }
     
             };
@@ -59,6 +91,7 @@ public class VarietyBoggle {
                 @Override
                 public void run() {
                    ((StandardBoggle)boggle).searchAllWords();
+                   System.out.println("Search done");
                 }
             };
             startup.execute(serverSetup);
@@ -109,25 +142,28 @@ public class VarietyBoggle {
     }
 
     private Player createLocalPlayer() {
-        AsciiPlayerUI pUi = new AsciiPlayerUI();
+        TerminalPlayerUI pUi = new TerminalPlayerUI();
         pUi.setInputStream(System.in);
         pUi.setOutputStream(System.out);
         Player locPlayer = new Player();
         locPlayer.setPlayerUI(pUi);
         locPlayer.setPlayerID(0);
-        locPlayer.sendMessage("You are player 0");
+        locPlayer.setBoggleMode(boggle);
+        locPlayer.sendMessage("You are player 0\n");
         return locPlayer;
     }
  
     private Player createRemotePlayer(Socket sock, int playerID, int numOfPlayer) throws IOException {
-        AsciiPlayerUI pUi = new AsciiPlayerUI();
+        SocketPlayerUI pUi = new SocketPlayerUI();
+        sockets.add(sock);
         pUi.setInputStream(sock.getInputStream());
         pUi.setOutputStream(sock.getOutputStream());
         Player remPlayer = new Player();
         remPlayer.setPlayerUI(pUi);
         remPlayer.setPlayerID(playerID);
-        remPlayer.sendMessage(String.format("You are player %d", playerID));
-        boggle.broadcastMessage(String.format("Waiting for players... \t %d/%d", playerID/numOfPlayer), -1);
+        remPlayer.setBoggleMode(boggle);
+        remPlayer.sendMessage(String.format("You are player %d \n", playerID));
+        boggle.broadcastMessage(String.format("Waiting for players... \t %d/%d\n", playerID,numOfPlayer), -1);
         return remPlayer;
     }
 }

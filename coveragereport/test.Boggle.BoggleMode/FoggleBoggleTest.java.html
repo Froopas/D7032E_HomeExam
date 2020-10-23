@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FoggleBoggleTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">test.Boggle.BoggleMode</a> &gt; <span class="el_source">FoggleBoggleTest.java</span></div><h1>FoggleBoggleTest.java</h1><pre class="source lang-java linenums">package test.Boggle.BoggleMode;
+
+import org.json.JSONObject;
+import org.junit.Test;
+
+import Boggle.BoggleMode.FoggleBoggle;
+import Player.Player;
+import Player.PlayerUI.TerminalPlayerUI;
+
+<span class="nc" id="L10">public class FoggleBoggleTest {</span>
+
+    @Test
+    public void FoggleInputTest() {
+<span class="nc" id="L14">        FoggleBoggle boggle = new FoggleBoggle();</span>
+<span class="nc" id="L15">        JSONObject json = boggle.getSettings();</span>
+<span class="nc" id="L16">        long seed = 1603452571556L;</span>
+<span class="nc" id="L17">        json.put(&quot;seed&quot;, seed);</span>
+
+        try {
+<span class="nc" id="L20">            boggle.initialize(json);</span>
+<span class="nc" id="L21">        } catch (Exception e) {</span>
+<span class="nc" id="L22">            e.printStackTrace();</span>
+<span class="nc" id="L23">        }</span>
+<span class="nc" id="L24">        TerminalPlayerUI ui = new TerminalPlayerUI();</span>
+<span class="nc" id="L25">        ui.setOutputStream(System.out);</span>
+<span class="nc" id="L26">        ui.setInputStream(System.in);</span>
+        try {
+<span class="nc" id="L28">            ui.renderBoard(boggle.getBoard());</span>
+<span class="nc" id="L29">        } catch (Exception e) {</span>
+<span class="nc" id="L30">            e.printStackTrace();</span>
+<span class="nc" id="L31">        }</span>
+<span class="nc" id="L32">        Player first = new Player();</span>
+<span class="nc" id="L33">        first.setBoggleMode(boggle);</span>
+<span class="nc" id="L34">        boggle.addPlayer(first);</span>
+        
+<span class="nc" id="L36">        String test = boggle.checkInput(&quot;4+8=1+2+2+2+5&quot;, 0);</span>
+<span class="nc" id="L37">        test = boggle.checkInput(&quot;2+6=9-1&quot;, 0);</span>
+<span class="nc" id="L38">        test = boggle.checkInput(&quot;2+2+7=3+0+6+3-1&quot;, 0);</span>
+<span class="nc" id="L39">        &quot;hej&quot;.toString();</span>
+<span class="nc" id="L40">    }</span>
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

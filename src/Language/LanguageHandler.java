@@ -12,11 +12,20 @@ import Util.Trie;
 
 public class LanguageHandler {
 
+    private static LanguageHandler langHan = null;
+
     private String LANGUAGE_DIR = "/home/frappe/document/D7032E/home_exam/Languages";
     private String DIE_FILE_END = ".csv";
     private String DICTIONARY_FILE_END = ".txt";
 
     private Map<String,File> languageDirs;
+
+    public static LanguageHandler getInstance() {
+        if (langHan == null) {
+            langHan = new LanguageHandler();
+        }
+        return langHan;
+    }
 
     public LanguageHandler() {
         languageDirs = new HashMap<String,File>();
@@ -34,6 +43,10 @@ public class LanguageHandler {
         ArrayList<String> dirNames = new ArrayList<String>();
         for (File dir :languages) {
             // might want to check if dir has atleas one csv and one txt file in the dir.
+            if (dir.getName().equals("Foggle")) {
+                languageDirs.put(dir.getName(), dir);
+                continue;
+            }
             dirNames.add(dir.getName());
             languageDirs.put(dir.getName(), dir);
         }

@@ -30,6 +30,10 @@ public class Player {
                 input = visual.getInput();
             } catch (IOException e) {
                 e.printStackTrace();
+                break;
+            }
+            if (input.equals("CLOSE SOCKET")) {
+                break;
             }
             if (currentlyPlaying) {
                 String message = boggle.checkInput(input, playerID);
@@ -65,10 +69,16 @@ public class Player {
     }
 
     public void addAcceptedInputs(String input) {
+        if (acceptedInputs == null) {
+            acceptedInputs = new ArrayList<String>();
+        }
         acceptedInputs.add(input);
     }
 
     public boolean isAccepted(String input) {
+        if (acceptedInputs == null) {
+            acceptedInputs = new ArrayList<String>();
+        }
         return acceptedInputs.contains(input);
     }
 

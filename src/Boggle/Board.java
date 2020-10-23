@@ -11,6 +11,8 @@ public class Board {
 
     private String[][] board;
 
+    private long seed;
+
     private Dimension dim;
 
     public Dimension getDimension() { 
@@ -30,6 +32,7 @@ public class Board {
     }
 
     public void initialize(Die dieSet, long seed) {
+        this.seed = seed;
         dim = dieSet.getDimenstion();
         int x = dim.getX();
         int y = dim.getY();

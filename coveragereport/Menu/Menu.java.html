@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Menu.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">Menu</a> &gt; <span class="el_source">Menu.java</span></div><h1>Menu.java</h1><pre class="source lang-java linenums">package Menu;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import Boggle.BoggleFactory;
+import Language.LanguageHandler;
+import Language.LanguageInfo;
+import Menu.MenuUI.MenuUI;
+
+<span class="nc" id="L14">public class Menu {</span>
+
+    private MenuUI visual;
+
+    public JSONObject run(JSONObject baseSetting) {
+<span class="nc" id="L19">        boolean shouldExit = false;</span>
+
+<span class="nc" id="L21">        ArrayList&lt;String&gt; gameModes = BoggleFactory.getGameModeNames();</span>
+<span class="nc" id="L22">        JSONObject setting = baseSetting;</span>
+<span class="nc" id="L23">        JSONObject returnSetting = setting;</span>
+
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        while (!shouldExit) {</span>
+            try {
+<span class="nc" id="L27">                visual.renderSettings(setting, &quot;Setting&quot;);</span>
+<span class="nc" id="L28">                visual.renderMessage(&quot;Write play to Play&quot;);</span>
+<span class="nc" id="L29">                String command = visual.getInput();</span>
+<span class="nc bnc" id="L30" title="All 9 branches missed.">                switch (command.toLowerCase()) {</span>
+                    case (&quot;gamemode&quot;):
+<span class="nc" id="L32">                        String gameMode = gamemodeMenu(returnSetting, gameModes);</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">                        if (gameMode != null) {</span>
+<span class="nc" id="L34">                            returnSetting = BoggleFactory.getDefaultSettings(gameMode);</span>
+<span class="nc" id="L35">                            setting = returnSetting;</span>
+                        }
+                    break;
+                    case (&quot;generous boggle&quot;):
+<span class="nc bnc" id="L39" title="All 2 branches missed.">                        returnSetting.put(&quot;generousBoggle&quot;, !returnSetting.getBoolean(&quot;generousBoggle&quot;));</span>
+<span class="nc" id="L40">                        setting = returnSetting;</span>
+<span class="nc" id="L41">                    break;</span>
+                    case (&quot;show solution&quot;):
+<span class="nc bnc" id="L43" title="All 2 branches missed.">                        returnSetting.put(&quot;showSolution&quot;, !returnSetting.getBoolean(&quot;showSolution&quot;));</span>
+<span class="nc" id="L44">                        setting = returnSetting;</span>
+<span class="nc" id="L45">                    break;</span>
+                    case (&quot;language&quot;):
+<span class="nc" id="L47">                        returnSetting.put(&quot;language&quot;, languageMenu(returnSetting));</span>
+<span class="nc" id="L48">                        setting = returnSetting;</span>
+<span class="nc" id="L49">                    break;</span>
+                    case (&quot;number of players&quot;): 
+<span class="nc" id="L51">                        visual.renderMessage(&quot;How many players? &quot;);</span>
+<span class="nc" id="L52">                        String in = visual.getInput();</span>
+                        try {
+<span class="nc" id="L54">                            int numOPlayer = Integer.parseInt(in);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                            if (numOPlayer &lt; 2) {</span>
+<span class="nc" id="L56">                                visual.renderMessage(&quot;The number of players needs to be atleast 2&quot;);</span>
+<span class="nc" id="L57">                                continue;</span>
+                            }
+<span class="nc" id="L59">                            returnSetting.put(&quot;numberOfPlayers&quot;, numOPlayer);</span>
+<span class="nc" id="L60">                            setting = returnSetting;</span>
+<span class="nc" id="L61">                        } catch (Exception e) {</span>
+                            //e.printStackTrace();
+<span class="nc" id="L63">                        }</span>
+<span class="nc" id="L64">                    break;</span>
+                    case (&quot;time to play&quot;):
+<span class="nc" id="L66">                        visual.renderMessage(&quot;For how many seconds should you play? &quot;);</span>
+<span class="nc" id="L67">                        String in2 = visual.getInput();</span>
+                        try {
+<span class="nc" id="L69">                            int numOPlayer = Integer.parseInt(in2);</span>
+<span class="nc" id="L70">                            returnSetting.put(&quot;gameTime&quot;, numOPlayer);</span>
+<span class="nc" id="L71">                            setting = returnSetting;</span>
+<span class="nc" id="L72">                        } catch (Exception e) {</span>
+                            //e.printStackTrace();
+<span class="nc" id="L74">                        }</span>
+<span class="nc" id="L75">                    break;</span>
+                    case(&quot;play&quot;):
+<span class="nc" id="L77">                        return returnSetting;</span>
+                    case(&quot;quit&quot;):
+<span class="nc" id="L79">                        return null;</span>
+                    
+                }
+<span class="nc" id="L82">            } catch (Exception e) {</span>
+<span class="nc" id="L83">                e.printStackTrace();</span>
+<span class="nc" id="L84">            }</span>
+        }
+
+<span class="nc" id="L87">        return returnSetting;</span>
+    }
+
+    private String gamemodeMenu(JSONObject base, ArrayList&lt;String&gt; gameModes) {
+        while(true) {
+<span class="nc" id="L92">            JSONObject opt = new JSONObject();</span>
+<span class="nc" id="L93">            opt.put(&quot;value&quot;, base.getString(&quot;gamemode&quot;));</span>
+<span class="nc" id="L94">            opt.put(&quot;options&quot;, gameModes);</span>
+<span class="nc" id="L95">            String input = &quot;&quot;;</span>
+            try{
+<span class="nc" id="L97">                visual.renderSettings(opt, &quot;GameMode&quot;);</span>
+<span class="nc" id="L98">                visual.renderMessage(&quot;write back to go back&quot;);</span>
+<span class="nc" id="L99">                input = visual.getInput();</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">                if (gameModes.contains(input)) {</span>
+<span class="nc" id="L101">                    return input;</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">                } else if(input.equals(&quot;back&quot;)) {</span>
+<span class="nc" id="L103">                    return null;</span>
+                }
+<span class="nc" id="L105">            } catch (Exception e) {</span>
+
+<span class="nc" id="L107">            }</span>
+<span class="nc" id="L108">        }</span>
+    }
+
+    private JSONObject languageMenu(JSONObject base) {
+<span class="nc" id="L112">        JSONObject lang = base.getJSONObject(&quot;language&quot;);</span>
+        try {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        while (true) {
+<span class="nc" id="L118">            String input = &quot;&quot;;</span>
+            try {
+<span class="nc" id="L120">                visual.renderSettings(lang, &quot;Language Settings&quot;);</span>
+<span class="nc" id="L121">                visual.renderMessage(&quot;Write the option to change: &quot;);</span>
+<span class="nc" id="L122">                input = visual.getInput();</span>
+<span class="nc" id="L123">            } catch (Exception e) {</span>
+<span class="nc" id="L124">                e.printStackTrace();</span>
+<span class="nc" id="L125">            }</span>
+<span class="nc" id="L126">            LanguageHandler langhan = LanguageHandler.getInstance();</span>
+<span class="nc" id="L127">            JSONObject opt = null;</span>
+<span class="nc" id="L128">            LanguageInfo info = null;</span>
+<span class="nc bnc" id="L129" title="All 5 branches missed.">            switch (input) {</span>
+                case (&quot;name&quot;):
+<span class="nc" id="L131">                    opt = new JSONObject();</span>
+<span class="nc" id="L132">                    opt.put(&quot;value&quot;, lang.getString(&quot;name&quot;));</span>
+<span class="nc" id="L133">                    opt.put(&quot;options&quot;, new JSONArray(langhan.getLanguages()));</span>
+                    try {
+<span class="nc" id="L135">                        visual.renderSettings(opt, &quot;Language&quot;);</span>
+<span class="nc" id="L136">                        String in = visual.getInput();</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">                        if (langhan.getLanguages().contains(in)) {</span>
+<span class="nc" id="L138">                            lang.put(&quot;name&quot;, in);</span>
+<span class="nc" id="L139">                            info = langhan.getLanguageInfo(in);</span>
+<span class="nc" id="L140">                            lang.put(&quot;size&quot;, info.getDimensions().get(0));</span>
+<span class="nc" id="L141">                            lang.put(&quot;dictionary&quot;, info.getDictionaries().get(0));</span>
+                        }
+<span class="nc" id="L143">                    } catch (IOException e) {</span>
+<span class="nc" id="L144">                        e.printStackTrace();</span>
+<span class="nc" id="L145">                    }</span>
+<span class="nc" id="L146">                break;</span>
+                case (&quot;size&quot;):
+<span class="nc" id="L148">                    opt = new JSONObject();</span>
+<span class="nc" id="L149">                    info = langhan.getLanguageInfo(lang.getString(&quot;name&quot;));</span>
+<span class="nc" id="L150">                    opt.put(&quot;value&quot;, lang.getString(&quot;size&quot;));</span>
+<span class="nc" id="L151">                    opt.put(&quot;options&quot;, new JSONArray(info.getDimensions()));</span>
+                    try {
+<span class="nc" id="L153">                        visual.renderSettings(opt, &quot;Size&quot;);</span>
+<span class="nc" id="L154">                        String in = visual.getInput();</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">                        if (info.getDimensions().contains(in)) {</span>
+<span class="nc" id="L156">                            lang.put(&quot;size&quot;, in);</span>
+                        }
+<span class="nc" id="L158">                    } catch (IOException e) {</span>
+<span class="nc" id="L159">                        e.printStackTrace();</span>
+<span class="nc" id="L160">                    }</span>
+<span class="nc" id="L161">                break;</span>
+                case (&quot;dictionary&quot;):
+<span class="nc" id="L163">                    opt = new JSONObject();</span>
+<span class="nc" id="L164">                    info = langhan.getLanguageInfo(lang.getString(&quot;name&quot;));</span>
+<span class="nc" id="L165">                    opt.put(&quot;value&quot;, lang.getString(&quot;dictionary&quot;));</span>
+<span class="nc" id="L166">                    opt.put(&quot;options&quot;, new JSONArray(info.getDictionaries()));</span>
+                    try {
+<span class="nc" id="L168">                        visual.renderSettings(opt, &quot;Dictionary&quot;);</span>
+<span class="nc" id="L169">                        String in = visual.getInput();</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">                        if (info.getDictionaries().contains(in)) {</span>
+<span class="nc" id="L171">                            lang.put(&quot;dictionary&quot;, in);</span>
+                        }
+<span class="nc" id="L173">                    } catch (IOException e) {</span>
+<span class="nc" id="L174">                        e.printStackTrace();</span>
+<span class="nc" id="L175">                    }</span>
+<span class="nc" id="L176">                break;</span>
+                case (&quot;back&quot;):
+<span class="nc" id="L178">                    return lang;</span>
+            }
+<span class="nc" id="L180">        }</span>
+    }
+
+    public void setVisual(MenuUI visual) {
+<span class="nc" id="L184">        this.visual = visual;</span>
+<span class="nc" id="L185">    }</span>
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

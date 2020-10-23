@@ -8,26 +8,25 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-import Player.PlayerUI.AsciiPlayerUI;
+import Player.PlayerUI.TerminalPlayerUI;
 
-<span class="fc" id="L13">public class PlayerUITest {</span>
+<span class="nc" id="L13">public class PlayerUITest {</span>
 
     @Test
     public void testInput() {
-<span class="fc" id="L17">        AsciiPlayerUI playerUi = new AsciiPlayerUI();</span>
-<span class="fc" id="L18">        String expected = &quot;testar 1.2.3...&quot;;</span>
+<span class="nc" id="L17">        TerminalPlayerUI playerUi = new TerminalPlayerUI();</span>
+<span class="nc" id="L18">        String expected = &quot;testar 1.2.3...&quot;;</span>
 
-<span class="fc" id="L20">        InputStream is = new ByteArrayInputStream(expected.getBytes());</span>
-<span class="fc" id="L21">        playerUi.setInputStream(is);</span>
-<span class="fc" id="L22">        String value = &quot;&quot;;</span>
+<span class="nc" id="L20">        InputStream is = new ByteArrayInputStream(expected.getBytes());</span>
+<span class="nc" id="L21">        String value = &quot;&quot;;</span>
         try {
-<span class="fc" id="L24">            value =  playerUi.getInput();</span>
-<span class="nc" id="L25">        } catch(IOException e)  {</span>
+<span class="nc" id="L23">            value =  playerUi.getInput();</span>
+<span class="nc" id="L24">        } catch(IOException e)  {</span>
 
-<span class="fc" id="L27">        }</span>
+<span class="nc" id="L26">        }</span>
 
-<span class="fc" id="L29">        assertEquals(expected, value);</span>
-<span class="fc" id="L30">    }</span>
+<span class="nc" id="L28">        assertEquals(expected, value);</span>
+<span class="nc" id="L29">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
