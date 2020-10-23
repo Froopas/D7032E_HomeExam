@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LanguageHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">Language</a> &gt; <span class="el_source">LanguageHandler.java</span></div><h1>LanguageHandler.java</h1><pre class="source lang-java linenums">package Language;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+import Util.Dimension;
+import Util.Trie;
+
+public class LanguageHandler {
+
+<span class="fc" id="L15">    private static LanguageHandler langHan = null;</span>
+
+<span class="fc" id="L17">    private String LANGUAGE_DIR = &quot;/home/frappe/document/D7032E/home_exam/Languages&quot;;</span>
+<span class="fc" id="L18">    private String DIE_FILE_END = &quot;.csv&quot;;</span>
+<span class="fc" id="L19">    private String DICTIONARY_FILE_END = &quot;.txt&quot;;</span>
+
+    private Map&lt;String,File&gt; languageDirs;
+
+    public static LanguageHandler getInstance() {
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        if (langHan == null) {</span>
+<span class="fc" id="L25">            langHan = new LanguageHandler();</span>
+        }
+<span class="fc" id="L27">        return langHan;</span>
+    }
+
+<span class="fc" id="L30">    public LanguageHandler() {</span>
+<span class="fc" id="L31">        languageDirs = new HashMap&lt;String,File&gt;();</span>
+<span class="fc" id="L32">        getLanguages();</span>
+<span class="fc" id="L33">    }</span>
+
+    /**
+     * Searches the Language folder for languages
+     * @return a list of available languages
+     */
+    public ArrayList&lt;String&gt; getLanguages() {
+<span class="fc" id="L40">        File langDir = new File(LANGUAGE_DIR);</span>
+<span class="fc" id="L41">        File[] languages = langDir.listFiles(File::isDirectory);</span>
+
+<span class="fc" id="L43">        ArrayList&lt;String&gt; dirNames = new ArrayList&lt;String&gt;();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        for (File dir :languages) {</span>
+            // might want to check if dir has atleas one csv and one txt file in the dir.
+<span class="fc bfc" id="L46" title="All 2 branches covered.">            if (dir.getName().equals(&quot;Foggle&quot;)) {</span>
+<span class="fc" id="L47">                languageDirs.put(dir.getName(), dir);</span>
+<span class="fc" id="L48">                continue;</span>
+            }
+<span class="fc" id="L50">            dirNames.add(dir.getName());</span>
+<span class="fc" id="L51">            languageDirs.put(dir.getName(), dir);</span>
+        }
+<span class="fc" id="L53">        return dirNames;</span>
+    }
+
+    /**
+     * Gets available die configuration and dictionaries for the language
+     * @param language to get Language info from
+     * @return Language info about that language
+     */
+    public LanguageInfo getLanguageInfo(String language) {
+<span class="fc" id="L62">        File langDir = languageDirs.get(language);</span>
+        
+<span class="fc" id="L64">        File[] files = langDir.listFiles();</span>
+<span class="fc" id="L65">        ArrayList&lt;String&gt; dictionaries = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L66">        ArrayList&lt;String&gt; dieSets = new ArrayList&lt;String&gt;();</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        for (File file: files) {</span>
+<span class="fc" id="L68">            String fileName = file.getName();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            if (fileName.endsWith(DIE_FILE_END)) {</span>
+<span class="fc" id="L70">                dieSets.add(fileName.replace(DIE_FILE_END, &quot;&quot;));</span>
+            }
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            if (fileName.endsWith(DICTIONARY_FILE_END)) {</span>
+<span class="fc" id="L73">                dictionaries.add(fileName.replace(DICTIONARY_FILE_END, &quot;&quot;));</span>
+            }
+        }
+
+<span class="fc" id="L77">        return new LanguageInfo(dictionaries, dieSets);</span>
+    }
+
+    /**
+     * Parses csv files and return dimension
+     * Example: &quot;4x3.csv&quot; returns a dimension with x:4 and y:3
+     * @param filename filename to parse
+     * @return Dimension that corresponds to the name
+     */
+    private Dimension parseDieFileName(String filename) {
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (!filename.endsWith(DIE_FILE_END)) {</span>
+<span class="nc" id="L88">            return null;</span>
+        }
+<span class="fc" id="L90">        String dimension = filename.replace(DIE_FILE_END, &quot;&quot;);</span>
+<span class="fc" id="L91">        String[] dim = dimension.split(&quot;x&quot;);</span>
+<span class="fc" id="L92">        int x = Integer.parseInt(dim[0]);</span>
+<span class="fc" id="L93">        int y = Integer.parseInt(dim[1]);</span>
+
+<span class="fc" id="L95">        return new Dimension(x, y);</span>
+    }
+
+    /**
+     * Loads languages from files
+     * @param language Which language to load
+     * @param dictionary which dictionary in the specified language folder
+     * @param dieSet which die set to load from the specified language folder
+     * @return A structure with the language selected
+     */
+    public LanguageHolder loadLanguage(String language, String dictionary, String dieSet) {
+<span class="fc" id="L106">        File langDir = languageDirs.get(language);</span>
+<span class="fc" id="L107">        Trie dict = null;</span>
+<span class="fc" id="L108">        Die die = null;</span>
+<span class="fc" id="L109">        File[] files = langDir.listFiles();</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        for (File file: files) {</span>
+<span class="fc" id="L111">            String fileName = file.getName();</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            if (fileName.startsWith(dictionary)) {</span>
+<span class="fc" id="L113">                dict = loadDictionary(file);</span>
+            }
+<span class="fc bfc" id="L115" title="All 2 branches covered.">            if (fileName.startsWith(dieSet)) {</span>
+<span class="fc" id="L116">                die = loadDieSet(file);</span>
+            }
+        }
+<span class="fc" id="L119">        return new LanguageHolder(language, die, dict);</span>
+    }
+
+    private Trie loadDictionary(File dictionaryFile) {
+<span class="fc" id="L123">        Trie dictionary = new Trie();</span>
+        try {
+<span class="fc" id="L125">            Scanner scan = new Scanner(dictionaryFile);</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            while(scan.hasNextLine()) {</span>
+<span class="fc" id="L127">                String line = scan.nextLine();</span>
+<span class="fc" id="L128">                dictionary.insert(line);</span>
+<span class="fc" id="L129">            }</span>
+<span class="fc" id="L130">            scan.close();</span>
+<span class="nc" id="L131">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L132">            e.printStackTrace();</span>
+<span class="fc" id="L133">        }</span>
+<span class="fc" id="L134">        return dictionary;</span>
+    }
+
+    private Die loadDieSet(File dieFile) {
+        Die dice;
+<span class="fc" id="L139">        ArrayList&lt;ArrayList&lt;String&gt;&gt; dieSet = new ArrayList&lt;ArrayList&lt;String&gt;&gt;();</span>
+        try {
+<span class="fc" id="L141">            Scanner scan = new Scanner(dieFile);</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">            while(scan.hasNextLine()) {</span>
+<span class="fc" id="L143">                String line = scan.nextLine();</span>
+<span class="fc" id="L144">                String[] faces = line.split(&quot;,&quot;);</span>
+<span class="fc" id="L145">                ArrayList&lt;String&gt; die = new ArrayList&lt;String&gt;();</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">                for (String face: faces){</span>
+<span class="fc" id="L147">                    die.add(face);</span>
+                }
+<span class="fc" id="L149">                dieSet.add(die);</span>
+<span class="fc" id="L150">            }</span>
+<span class="fc" id="L151">            scan.close();</span>
+<span class="nc" id="L152">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L153">            e.printStackTrace();</span>
+<span class="fc" id="L154">        }</span>
+<span class="fc" id="L155">        Dimension dim = parseDieFileName(dieFile.getName());</span>
+<span class="fc" id="L156">        dice = new Die(dim,dieSet);</span>
+<span class="fc" id="L157">        return dice;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FoggleBoggle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">Boggle.BoggleMode</a> &gt; <span class="el_source">FoggleBoggle.java</span></div><h1>FoggleBoggle.java</h1><pre class="source lang-java linenums">package Boggle.BoggleMode;
+
+import java.util.ArrayList;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
+import org.json.JSONObject;
+
+import Boggle.Board;
+import Language.Die;
+import Language.LanguageHandler;
+import Language.LanguageHolder;
+import Language.LanguageInfo;
+import Player.Player;
+
+<span class="fc" id="L17">public class FoggleBoggle implements BoggleMode {</span>
+
+    private Board board;
+
+    private boolean generousBoggleOn;
+
+<span class="fc" id="L23">    private ScriptEngineManager mgr  = new ScriptEngineManager();</span>
+<span class="fc" id="L24">    private ScriptEngine javaScriptEngine = mgr.getEngineByName(&quot;JavaScript&quot;);</span>
+
+    ArrayList&lt;Player&gt; players;
+
+    @Override
+    public JSONObject getSettings() {
+<span class="fc" id="L30">        JSONObject body = new JSONObject();</span>
+
+<span class="fc" id="L32">        body.put(&quot;gamemode&quot;, &quot;FoggleBoggle&quot;);</span>
+
+<span class="fc" id="L34">        body.put(&quot;generousBoggle&quot;, false);</span>
+        
+<span class="fc" id="L36">        JSONObject language = new JSONObject();</span>
+<span class="fc" id="L37">        LanguageHandler langHan = LanguageHandler.getInstance();</span>
+<span class="fc" id="L38">        String languageName = &quot;Foggle&quot;;</span>
+<span class="fc" id="L39">        LanguageInfo info = langHan.getLanguageInfo(languageName);</span>
+<span class="fc" id="L40">        String boardSize = info.getDimensions().get(0);</span>
+<span class="fc" id="L41">        String dict = &quot;Foggle&quot;;</span>
+
+
+<span class="fc" id="L44">        language.put(&quot;name&quot;, languageName);</span>
+<span class="fc" id="L45">        language.put(&quot;size&quot;, boardSize);</span>
+<span class="fc" id="L46">        language.put(&quot;dictionary&quot;, dict);</span>
+<span class="fc" id="L47">        body.put(&quot;language&quot;, language);</span>
+<span class="fc" id="L48">        body.put(&quot;numberOfPlayers&quot;, 2);</span>
+<span class="fc" id="L49">        body.put(&quot;gameTime&quot;, 60);</span>
+<span class="fc" id="L50">        body.put(&quot;showSolution&quot;,false);</span>
+<span class="fc" id="L51">        return body;</span>
+    }
+
+    @Override
+    public void initialize(JSONObject setting) throws Exception {
+<span class="fc" id="L56">        JSONObject language = setting.getJSONObject(&quot;language&quot;);</span>
+
+<span class="fc" id="L58">        generousBoggleOn = setting.getBoolean(&quot;generousBoggle&quot;);</span>
+
+<span class="fc" id="L60">        int numberOfPlayers = setting.getInt(&quot;numberOfPlayers&quot;);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (numberOfPlayers &lt; 2) {</span>
+<span class="fc" id="L62">            throw new Exception(&quot;The amount of players are too low&quot;);</span>
+        }
+<span class="fc" id="L64">        players = new ArrayList&lt;Player&gt;();</span>
+
+<span class="fc" id="L66">        String langName = &quot;Foggle&quot;;</span>
+<span class="fc" id="L67">        String dimension = language.getString(&quot;size&quot;);</span>
+<span class="fc" id="L68">        String dictName = &quot;Foggle&quot;;</span>
+
+<span class="fc" id="L70">        LanguageHandler langHan = LanguageHandler.getInstance();</span>
+<span class="fc" id="L71">        LanguageHolder lang = langHan.loadLanguage(langName, dictName, dimension);</span>
+
+<span class="fc" id="L73">        long seed = setting.optLong(&quot;seed&quot;, 0);</span>
+
+<span class="fc" id="L75">        generateBoard(lang.getDice(), seed);</span>
+<span class="fc" id="L76">    }</span>
+
+    private void generateBoard(Die dieSet, long seed) {
+<span class="fc" id="L79">        board = new Board();</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (seed == 0) {</span>
+<span class="nc" id="L81">            board.initialize(dieSet);</span>
+<span class="nc" id="L82">            return;</span>
+        }
+<span class="fc" id="L84">        board.initialize(dieSet, seed);</span>
+<span class="fc" id="L85">    }</span>
+
+    int calculateScore(String input) {
+<span class="fc" id="L88">        int length = input.replace(&quot;[^0-9]&quot;, &quot;&quot;).length();</span>
+<span class="pc bpc" id="L89" title="2 of 4 branches missed.">        if (length &gt;= 3 &amp;&amp; length &lt;= 4) {</span>
+<span class="nc" id="L90">            return 1;</span>
+<span class="pc bpc" id="L91" title="2 of 4 branches missed.">        } else if (length &gt; 4 &amp;&amp; length &lt;7 ) {</span>
+<span class="fc" id="L92">            return length - 3;</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        } else if (length == 7) {</span>
+<span class="nc" id="L94">            return 5;</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        } else if (length &gt; 7) {</span>
+<span class="nc" id="L96">            return 11;</span>
+        } else {
+<span class="nc" id="L98">            return 0;</span>
+        }
+    }
+
+    @Override
+    public Board getBoard() {
+<span class="fc" id="L104">        return board;</span>
+    }
+
+    @Override
+    public void addPlayer(Player player) {
+<span class="fc" id="L109">        this.players.add(player);</span>
+<span class="fc" id="L110">    }</span>
+
+    @Override
+    public ArrayList&lt;Player&gt; getPlayers() {
+<span class="nc" id="L114">        return players;</span>
+    }
+
+    @Override
+    public void startGame() {
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        for (Player pl: players) {</span>
+<span class="nc" id="L120">            pl.setPlaying(true);</span>
+<span class="nc" id="L121">        }</span>
+<span class="nc" id="L122">        this.broadcastMessage(&quot;Lets play!!\n&quot;, -1);</span>
+<span class="nc" id="L123">    }</span>
+
+    @Override
+    public void broadcastMessage(String message, int excludePlayer) {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        for(Player player: players) {</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (player.getPlayerID() == excludePlayer) {</span>
+<span class="nc" id="L129">                continue;</span>
+            }
+<span class="nc" id="L131">            player.sendMessage(message);</span>
+<span class="nc" id="L132">        }</span>
+
+<span class="nc" id="L134">    }</span>
+
+    @Override
+    public void finnishGame() {
+<span class="nc" id="L138">        Player winner = null;</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        for (Player pl: players) {</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">            if (winner == null) {</span>
+<span class="nc" id="L141">                winner = pl;</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">            } else if(winner.getScore() &lt; pl.getScore()) {</span>
+<span class="nc" id="L143">                winner = pl;</span>
+            }
+<span class="nc" id="L145">            pl.sendMessage(String.format(&quot;You got a score of %d\n&quot;, pl.getScore()));</span>
+<span class="nc" id="L146">            pl.setPlaying(false);</span>
+<span class="nc" id="L147">        }</span>
+<span class="nc" id="L148">        broadcastMessage(String.format(&quot;The winner of this game is player %d with a score of %d\n&quot;, winner.getPlayerID(), winner.getScore()), -1);</span>
+<span class="nc" id="L149">        winner.sendMessage(&quot;Congratualations you won!!\n&quot;);</span>
+<span class="nc" id="L150">    }</span>
+
+    @Override
+    public String checkInput(String input, int playerID) {
+<span class="fc" id="L154">        String[] expressions = input.split(&quot;=&quot;);</span>
+<span class="fc" id="L155">        boolean validInput = false;</span>
+<span class="fc" id="L156">        Player pl = players.get(playerID);</span>
+        try {
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            validInput = (javaScriptEngine.eval(expressions[0]) == javaScriptEngine.eval(expressions[1]));</span>
+<span class="pc bpc" id="L159" title="1 of 4 branches missed.">            validInput = validInput &amp;&amp; !pl.isAccepted(input);</span>
+<span class="nc" id="L160">        } catch(Exception e) {</span>
+<span class="fc" id="L161">        }</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (validInput) {</span>
+<span class="fc" id="L163">            String nums = input.replaceAll(&quot;[^a-zA-Z0-9]&quot;, &quot;&quot;);</span>
+<span class="fc" id="L164">            int x = board.getDimension().getX();</span>
+<span class="fc" id="L165">            int y = board.getDimension().getY();</span>
+<span class="fc" id="L166">            boolean[][] processed = new boolean[y][x];</span>
+<span class="fc" id="L167">            boolean found = false;</span>
+
+<span class="fc bfc" id="L169" title="All 2 branches covered.">            for (int row = 0; row &lt; y; row++) {</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">                for (int col = 0; col &lt; x; col++) {</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">                    if (board.getBoard(col, row).startsWith(nums.substring(0,1))) {</span>
+<span class="fc" id="L172">                        found = searchBoard(nums, col, row, 1, processed);</span>
+                    }
+                }
+            }
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">            if(found) {</span>
+<span class="fc" id="L177">                pl.addAcceptedInputs(input);</span>
+<span class="fc" id="L178">                pl.setScore(pl.getScore() + calculateScore(input.replaceAll(&quot;[^0-9]&quot;, &quot;&quot;)));</span>
+<span class="fc" id="L179">                return &quot;OK&quot;;</span>
+            }
+<span class="nc" id="L181">            return &quot;NOT OK&quot;;</span>
+        }
+<span class="fc" id="L183">        return &quot;NOT OK&quot;;</span>
+    }
+
+<span class="fc" id="L186">    private static int[] rowOpt = {-1,-1,-1, 0, 0, 1, 1, 1}; // all possible moves in a boggle board</span>
+<span class="fc" id="L187">    private static int[] colOpt = {-1, 0, 1,-1, 1,-1, 0, 1};</span>
+
+<span class="fc" id="L189">    private boolean foundOnBoard = false;</span>
+
+    private boolean searchBoard(String input, int x, int y, int matches, boolean[][] processed) {
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        if (matches &gt;= input.length()) {</span>
+<span class="fc" id="L193">            foundOnBoard = true;</span>
+<span class="fc" id="L194">            return true;</span>
+        }
+
+<span class="fc" id="L197">        processed[y][x] = true;</span>
+
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">        for(int k = 0; k &lt; 8; k++) {</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">            if (isValid(x + colOpt[k], y + rowOpt[k], processed)) {</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">                if (input.substring(matches, matches+1).equals(board.getBoard(x + colOpt[k], y + rowOpt[k]))) {</span>
+<span class="fc" id="L202">                    searchBoard(input, x + colOpt[k], y + rowOpt[k], matches + 1, processed);</span>
+                }
+            }
+<span class="fc bfc" id="L205" title="All 2 branches covered.">            if (foundOnBoard) {</span>
+<span class="fc" id="L206">                return true;</span>
+            }
+        }
+
+<span class="nc" id="L210">        processed[y][x] = false;</span>
+<span class="nc" id="L211">        return false;</span>
+    }
+
+    private boolean isValid(int x, int y, boolean[][] processed) {
+<span class="pc bpc" id="L215" title="1 of 6 branches missed.">        return  (x &gt;= 0 &amp;&amp; x &lt; board.getDimension().getX()) &amp;&amp;</span>
+<span class="pc bpc" id="L216" title="2 of 6 branches missed.">                (y &gt;= 0 &amp;&amp; y &lt; board.getDimension().getY()) &amp;&amp;</span>
+                (!processed[y][x] || generousBoggleOn);
+    }
+
+
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

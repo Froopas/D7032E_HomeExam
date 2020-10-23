@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlayerUITest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">test.Player.PlayerUI</a> &gt; <span class="el_source">PlayerUITest.java</span></div><h1>PlayerUITest.java</h1><pre class="source lang-java linenums">package test.Player.PlayerUI;
+
+import static org.junit.Assert.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.junit.Test;
+
+import Player.PlayerUI.TerminalPlayerUI;
+
+<span class="nc" id="L13">public class PlayerUITest {</span>
+
+    @Test
+    public void testInput() {
+<span class="nc" id="L17">        TerminalPlayerUI playerUi = new TerminalPlayerUI();</span>
+<span class="nc" id="L18">        String expected = &quot;testar 1.2.3...&quot;;</span>
+
+<span class="nc" id="L20">        InputStream is = new ByteArrayInputStream(expected.getBytes());</span>
+<span class="nc" id="L21">        String value = &quot;&quot;;</span>
+        try {
+<span class="nc" id="L23">            value =  playerUi.getInput();</span>
+<span class="nc" id="L24">        } catch(IOException e)  {</span>
+
+<span class="nc" id="L26">        }</span>
+
+<span class="nc" id="L28">        assertEquals(expected, value);</span>
+<span class="nc" id="L29">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

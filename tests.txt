@@ -1,0 +1,5 @@
+./src/test/Language/LanguageHandlerTest.java
+./src/test/Player/PlayerUI/PlayerUITest.java
+./src/test/Boggle/BoggleMode/StandardBoggleTest.java
+./src/test/Boggle/BoggleMode/BoggleModeTest.java
+./src/test/Boggle/BoggleMode/FoggleBoggleTest.java

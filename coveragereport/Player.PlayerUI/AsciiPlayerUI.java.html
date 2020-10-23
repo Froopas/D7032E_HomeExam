@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AsciiPlayerUI.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">Player.PlayerUI</a> &gt; <span class="el_source">AsciiPlayerUI.java</span></div><h1>AsciiPlayerUI.java</h1><pre class="source lang-java linenums">package Player.PlayerUI;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+
+import Boggle.Board;
+
+<span class="fc" id="L11">public class AsciiPlayerUI implements PlayerUI {</span>
+
+    private OutputStream out;
+    private InputStream in;
+
+    public void setOutputStream(OutputStream os) {
+<span class="nc" id="L17">        this.out = os;</span>
+<span class="nc" id="L18">    }</span>
+
+    public void setInputStream(InputStream is) {
+<span class="fc" id="L21">        this.in = is;</span>
+<span class="fc" id="L22">    }</span>
+
+    @Override
+    public void renderBoard(Board board) throws IOException {
+<span class="nc" id="L26">        int x = board.getDimension().getX();</span>
+<span class="nc" id="L27">        int y = board.getDimension().getY();</span>
+<span class="nc" id="L28">        String boardString = &quot;&quot;;</span>
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        for (int i = 0; i &lt; y; i++) {</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">            for (int j = 0; j &lt; x; j++) {</span>
+<span class="nc" id="L31">                String cha = board.getBoard(i, j);</span>
+<span class="nc" id="L32">                boardString.concat(cha).concat(&quot;\t&quot;);</span>
+            }
+<span class="nc" id="L34">            boardString.concat(&quot;\n&quot;);</span>
+        }
+
+<span class="nc" id="L37">        out.write(boardString.getBytes());</span>
+<span class="nc" id="L38">    }</span>
+
+    @Override
+    public void renderMessage(String message) throws IOException {
+<span class="nc" id="L42">        out.write(message.getBytes());</span>
+<span class="nc" id="L43">    }</span>
+
+    @Override
+    public String getInput() throws IOException {
+<span class="fc" id="L47">        ByteArrayOutputStream buffer = new ByteArrayOutputStream();</span>
+
+        // read from the inputStream and write it to buffe
+        int nread;
+<span class="fc" id="L51">        byte[] data = new byte[1024];</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        while((nread = in.read(data,0,data.length)) != -1) {</span>
+<span class="fc" id="L53">            buffer.write(data,0, nread);</span>
+        }
+<span class="fc" id="L55">        buffer.flush();</span>
+
+        // convert buffer to string
+<span class="fc" id="L58">        String input = new String(buffer.toByteArray(), StandardCharsets.UTF_8);</span>
+<span class="fc" id="L59">        return input;</span>
+    }
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

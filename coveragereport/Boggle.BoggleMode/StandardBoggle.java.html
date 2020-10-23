@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StandardBoggle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CodeCoverageReport</a> &gt; <a href="index.source.html" class="el_package">Boggle.BoggleMode</a> &gt; <span class="el_source">StandardBoggle.java</span></div><h1>StandardBoggle.java</h1><pre class="source lang-java linenums">package Boggle.BoggleMode;
+
+import java.util.ArrayList;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import Boggle.Board;
+import Language.Die;
+import Language.LanguageHandler;
+import Language.LanguageHolder;
+import Language.LanguageInfo;
+import Player.Player;
+import Util.Trie;
+import Util.TrieNode;
+
+<span class="fc" id="L18">public class StandardBoggle implements BoggleMode {</span>
+
+    private Board board;
+
+    private boolean generousBoggleOn;
+    private boolean showSolution;
+
+    private Trie dictionary;
+
+    private Trie foundWords;
+
+    private ArrayList&lt;String&gt; foundWordsList;
+
+    private boolean searchCompleted;
+
+    ArrayList&lt;Player&gt; players;
+
+    @Override
+    public JSONObject getSettings() {
+<span class="fc" id="L37">        JSONObject body = new JSONObject();</span>
+
+<span class="fc" id="L39">        body.put(&quot;gamemode&quot;, &quot;StandardBoggle&quot;);</span>
+
+<span class="fc" id="L41">        body.put(&quot;generousBoggle&quot;, false);</span>
+        
+<span class="fc" id="L43">        JSONObject language = new JSONObject();</span>
+<span class="fc" id="L44">        LanguageHandler langHan = LanguageHandler.getInstance();</span>
+<span class="fc" id="L45">        String languageName = langHan.getLanguages().get(0);</span>
+<span class="fc" id="L46">        LanguageInfo info = langHan.getLanguageInfo(languageName);</span>
+<span class="fc" id="L47">        String boardSize = info.getDimensions().get(0);</span>
+<span class="fc" id="L48">        String dict = info.getDictionaries().get(0);</span>
+
+
+<span class="fc" id="L51">        language.put(&quot;name&quot;, &quot;English&quot;);</span>
+<span class="fc" id="L52">        language.put(&quot;size&quot;, &quot;4x4&quot;);</span>
+<span class="fc" id="L53">        language.put(&quot;dictionary&quot;, &quot;dic&quot;);</span>
+<span class="fc" id="L54">        body.put(&quot;language&quot;, language);</span>
+<span class="fc" id="L55">        body.put(&quot;numberOfPlayers&quot;, 2);</span>
+<span class="fc" id="L56">        body.put(&quot;gameTime&quot;, 60);</span>
+<span class="fc" id="L57">        body.put(&quot;showSolution&quot;,true);</span>
+<span class="fc" id="L58">        return body;</span>
+    }
+
+    @Override
+    public void initialize(JSONObject setting) throws Exception {
+<span class="fc" id="L63">        JSONObject language = setting.getJSONObject(&quot;language&quot;);</span>
+
+<span class="fc" id="L65">        generousBoggleOn = setting.getBoolean(&quot;generousBoggle&quot;);</span>
+
+<span class="fc" id="L67">        int numberOfPlayers = setting.getInt(&quot;numberOfPlayers&quot;);</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (numberOfPlayers &lt; 2) {</span>
+<span class="fc" id="L69">            throw new Exception(&quot;The amount of players are too low&quot;);</span>
+        }
+<span class="fc" id="L71">        players = new ArrayList&lt;Player&gt;();</span>
+
+<span class="fc" id="L73">        showSolution = setting.getBoolean(&quot;showSolution&quot;);</span>
+
+<span class="fc" id="L75">        String langName = language.getString(&quot;name&quot;);</span>
+<span class="fc" id="L76">        String dimension = language.getString(&quot;size&quot;);</span>
+<span class="fc" id="L77">        String dictName = language.getString(&quot;dictionary&quot;);</span>
+
+<span class="fc" id="L79">        LanguageHandler langHan = LanguageHandler.getInstance();</span>
+<span class="fc" id="L80">        LanguageHolder lang = langHan.loadLanguage(langName, dictName, dimension);</span>
+
+<span class="fc" id="L82">        long seed = setting.optLong(&quot;seed&quot;, 0);</span>
+
+<span class="fc" id="L84">        dictionary = lang.getDictionary();</span>
+
+<span class="fc" id="L86">        generateBoard(lang.getDice(), seed);</span>
+<span class="fc" id="L87">    }</span>
+
+    @Override
+    public String checkInput(String input, int playerID) {
+<span class="fc" id="L91">        Player player = players.get(playerID);</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (searchCompleted) {</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">            if (dictionary.containsNode(input)) { </span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">                if (foundWords.containsNode(input)) {</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">                    if (player.isAccepted(input)) {</span>
+<span class="fc" id="L96">                        return &quot;You have already submitted this word&quot;;</span>
+                    }
+<span class="fc" id="L98">                    player.setScore(player.getScore() + calculateScore(input)); </span>
+<span class="fc" id="L99">                    player.addAcceptedInputs(input);</span>
+<span class="fc" id="L100">                    return &quot;OK&quot;;</span>
+                }
+<span class="fc" id="L102">                return &quot;Not on Board&quot;;</span>
+            }
+<span class="nc" id="L104">            return &quot;Not in dictionary&quot;;</span>
+        }
+<span class="nc" id="L106">        return &quot;Search is not completed&quot;;</span>
+    }
+
+    @Override
+    public void broadcastMessage(String message, int excludePlayer) {
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        for(Player player: players) {</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            if (player.getPlayerID() == excludePlayer) {</span>
+<span class="fc" id="L113">                continue;</span>
+            }
+<span class="fc" id="L115">            player.sendMessage(message);</span>
+<span class="fc" id="L116">        }</span>
+<span class="fc" id="L117">    }</span>
+
+    public void addPlayer(Player player) {
+<span class="fc" id="L120">        this.players.add(player);</span>
+<span class="fc" id="L121">    }</span>
+
+    public int calculateScore(String input) {
+<span class="fc" id="L124">        int length = input.length();</span>
+<span class="fc bfc" id="L125" title="All 4 branches covered.">        if (length &gt;= 3 &amp;&amp; length &lt;= 4) {</span>
+<span class="fc" id="L126">            return 1;</span>
+<span class="fc bfc" id="L127" title="All 4 branches covered.">        } else if (length &gt; 4 &amp;&amp; length &lt;7 ) {</span>
+<span class="fc" id="L128">            return length - 3;</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">        } else if (length == 7) {</span>
+<span class="fc" id="L130">            return 5;</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">        } else if (length &gt; 7) {</span>
+<span class="nc" id="L132">            return 11;</span>
+        } else {
+<span class="fc" id="L134">            return 0;</span>
+        }
+    }
+
+    private void generateBoard(Die dieSet, long seed) {
+<span class="fc" id="L139">        board = new Board();</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (seed == 0) {</span>
+<span class="nc" id="L141">            board.initialize(dieSet);</span>
+<span class="nc" id="L142">            return;</span>
+        }
+<span class="fc" id="L144">        board.initialize(dieSet, seed);</span>
+<span class="fc" id="L145">    }</span>
+
+    public ArrayList&lt;String&gt; getAllWords() {
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">        if(searchCompleted) {</span>
+<span class="fc" id="L149">            return foundWordsList;</span>
+        }
+<span class="nc" id="L151">        return null;</span>
+    }
+
+
+<span class="fc" id="L155">    private static int[] rowOpt = {-1,-1,-1, 0, 0, 1, 1, 1}; // all possible moves in a boggle board</span>
+<span class="fc" id="L156">    private static int[] colOpt = {-1, 0, 1,-1, 1,-1, 0, 1};</span>
+
+    public void searchAllWords() {
+<span class="fc" id="L159">        this.foundWords = new Trie();</span>
+<span class="fc" id="L160">        this.foundWordsList = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L161">        int x = board.getDimension().getX();</span>
+<span class="fc" id="L162">        int y = board.getDimension().getY();</span>
+<span class="fc" id="L163">        boolean[][] processed = new boolean[y][x];</span>
+
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        for (int row = 0; row &lt; y; row++) {</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">            for (int col = 0; col &lt; x; col++) {</span>
+<span class="fc" id="L167">                String ch = board.getBoard(col, row);</span>
+<span class="fc" id="L168">                TrieNode firstChar = null;</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">                if (ch.equals(&quot;Qu&quot;)) {</span>
+<span class="fc" id="L170">                    TrieNode q = dictionary.getRoot().getChildren().get('Q');</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">                    if (q == null) {</span>
+<span class="nc" id="L172">                        continue;</span>
+                    }
+<span class="fc" id="L174">                    firstChar = q.getChildren().get('U');</span>
+<span class="fc" id="L175">                } else {</span>
+<span class="fc" id="L176">                    firstChar = dictionary.getRoot().getChildren().get(ch.toCharArray()[0]);</span>
+                }
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">                if (firstChar != null) {</span>
+<span class="fc" id="L179">                    searchBoard(firstChar, col, row, processed, ch);</span>
+                }
+            }
+        }
+<span class="fc" id="L183">        searchCompleted = true;</span>
+<span class="fc" id="L184">    }</span>
+
+    private void searchBoard(TrieNode node, int x, int y, boolean[][] processed, String path) {
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        if (node.isWord()) {</span>
+<span class="fc" id="L188">            foundWords.insert(path);</span>
+<span class="fc" id="L189">            foundWordsList.add(path);</span>
+        }
+
+<span class="fc" id="L192">        processed[y][x] = true;</span>
+
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        for (var entry: node.getChildren().entrySet()) {</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">            for (int k = 0; k &lt; 8; k++) {</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">                if(isValid(x + colOpt[k], y + rowOpt[k], processed, entry.getKey())) {</span>
+                    // Check the special case of Qu on the board
+<span class="fc" id="L198">                    String ch = board.getBoard(x + colOpt[k], y + rowOpt[k]);</span>
+<span class="fc bfc" id="L199" title="All 4 branches covered.">                    if (ch.equals(&quot;Qu&quot;) &amp;&amp; entry.getKey().toString().equals(&quot;Q&quot;) ) {</span>
+<span class="fc" id="L200">                        TrieNode entryChild = entry.getValue().getChildren().get('U');</span>
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">                        if (entryChild == null) {</span>
+<span class="nc" id="L202">                            continue;</span>
+                        }
+<span class="fc" id="L204">                        searchBoard(entryChild, x + colOpt[k], y + rowOpt[k], processed, path.concat(&quot;QU&quot;)); </span>
+                    // See if the child of the trie has the same char as the board
+<span class="fc bfc" id="L206" title="All 2 branches covered.">                    } else if (ch.equals(entry.getKey().toString())) {</span>
+<span class="fc" id="L207">                        searchBoard(entry.getValue(), x + colOpt[k], y + rowOpt[k], processed, path.concat(entry.getKey().toString()));</span>
+                    }
+                }
+            }
+<span class="fc" id="L211">        }</span>
+
+<span class="fc" id="L213">        processed[y][x]= false;</span>
+<span class="fc" id="L214">    }</span>
+
+    private boolean isValid(int x, int y, boolean[][] processed, Character ch) {
+<span class="fc bfc" id="L217" title="All 6 branches covered.">        return  (x&gt;= 0 &amp;&amp; x &lt; board.getDimension().getX()) &amp;&amp; // see if index is out of bounds</span>
+<span class="fc bfc" id="L218" title="All 6 branches covered.">                (y&gt;= 0 &amp;&amp; y &lt; board.getDimension().getY()) &amp;&amp;</span>
+                (!processed[y][x] || generousBoggleOn); // see if the tile is not processed or generous boggle is on
+    }
+
+    @Override
+    public Board getBoard() {
+<span class="fc" id="L224">        return board;</span>
+    }
+
+    @Override
+    public ArrayList&lt;Player&gt; getPlayers() {
+<span class="nc" id="L229">        return players;</span>
+    }
+
+    @Override
+    public void startGame() {
+<span class="nc bnc" id="L234" title="All 2 branches missed.">        for (Player pl: players) {</span>
+<span class="nc" id="L235">            pl.setPlaying(true);</span>
+<span class="nc" id="L236">        }</span>
+<span class="nc" id="L237">        this.broadcastMessage(&quot;Lets play!!\n&quot;, -1);</span>
+<span class="nc" id="L238">    }</span>
+
+    @Override
+    public void finnishGame() {
+<span class="fc" id="L242">        Player winner = null;</span>
+<span class="fc bfc" id="L243" title="All 2 branches covered.">        for (Player pl: players) {</span>
+<span class="pc bpc" id="L244" title="1 of 2 branches missed.">            if (winner == null) {</span>
+<span class="fc" id="L245">                winner = pl;</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">            } else if(winner.getScore() &lt; pl.getScore()) {</span>
+<span class="nc" id="L247">                winner = pl;</span>
+            }
+<span class="fc" id="L249">            pl.sendMessage(String.format(&quot;You got a score of %d\n&quot;, pl.getScore()));</span>
+<span class="fc" id="L250">            pl.setPlaying(false);</span>
+<span class="fc" id="L251">        }</span>
+<span class="fc" id="L252">        broadcastMessage(String.format(&quot;The winner of this game is player %d with a score of %d\n&quot;, winner.getPlayerID(), winner.getScore()), -1);</span>
+<span class="fc" id="L253">        winner.sendMessage(&quot;Congratualations you won!!\n&quot;);</span>
+
+<span class="pc bpc" id="L255" title="1 of 2 branches missed.">        if (showSolution) {</span>
+<span class="fc" id="L256">            String message = &quot;These are the possible words\n&quot;;</span>
+<span class="fc" id="L257">            StringBuffer sb = new StringBuffer();</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">            for (String word: foundWordsList) {</span>
+<span class="fc" id="L259">                sb.append(word.concat(&quot;,&quot;));</span>
+<span class="fc" id="L260">            }</span>
+<span class="fc" id="L261">            message = message.concat(sb.toString());</span>
+<span class="fc bfc" id="L262" title="All 2 branches covered.">            for (Player pl: players) {</span>
+<span class="fc" id="L263">                pl.sendMessage(message);</span>
+<span class="fc" id="L264">            }</span>
+        }
+<span class="fc" id="L266">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
