@@ -27,10 +27,17 @@ public class Menu {
         JSONObject setting = baseSetting;
         JSONObject returnSetting = setting;
 
+        try {
+            visual.renderMessage("Write what you want to change!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         while (!shouldExit) {
             try {
                 visual.renderSettings(setting, "Setting");
                 visual.renderMessage("Write play to Play");
+                visual.renderMessage("Write quit to quit");
                 String command = visual.getInput();
                 switch (command.toLowerCase()) {
                     case ("gamemode"):
@@ -134,7 +141,7 @@ public class Menu {
             JSONObject opt = null;
             LanguageInfo info = null;
             switch (input) {
-                case ("name"):
+                case ("language"):
                     opt = new JSONObject();
                     opt.put("value", lang.getString("name"));
                     opt.put("options", new JSONArray(langhan.getLanguages()));

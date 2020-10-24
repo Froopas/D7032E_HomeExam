@@ -17,6 +17,7 @@ public class LanguageHandlerTest {
     @Test
     public void getLanguagesTest() {
         List<String> expected = new ArrayList<String>();
+        expected.add("Spanish");
         expected.add("English");
 
         LanguageHandler langHan = new LanguageHandler();
@@ -37,6 +38,14 @@ public class LanguageHandlerTest {
     public void loadLanguageTest() {
         LanguageHandler langHan = new LanguageHandler();
         LanguageHolder lang = langHan.loadLanguage("English", "dic", "4x4");
+
+        "hej".toString();
+    }
+
+    @Test
+    public void loadLanguageSpanTest() {
+        LanguageHandler langHan = new LanguageHandler();
+        LanguageHolder lang = langHan.loadLanguage("Spanish", "DictButSpanish", "4x4");
 
         "hej".toString();
     }

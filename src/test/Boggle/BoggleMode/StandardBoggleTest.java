@@ -14,6 +14,9 @@ public class StandardBoggleTest {
     public void standardBoggleInitializeTest() {
         StandardBoggle boggle = new StandardBoggle();
         JSONObject json = boggle.getSettings();
+        JSONObject lang = json.getJSONObject("language");
+        //lang.put("name", "Spanish");
+        //lang.put("dictionary", "DictButSpanish");
         json.put("seed", 0);
         json.put("generousBoggle", false);
         Long start = System.currentTimeMillis();
