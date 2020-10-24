@@ -58,8 +58,7 @@ public class SocketPlayerUI implements PlayerUI {
         String input = "";
         try {
             input = (String) in.readObject();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
         }
         return input.toUpperCase();
     }

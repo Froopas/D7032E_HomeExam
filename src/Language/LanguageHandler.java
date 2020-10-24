@@ -29,6 +29,21 @@ public class LanguageHandler {
 
     public LanguageHandler() {
         languageDirs = new HashMap<String,File>();
+        String currPath = "";
+        try {
+            currPath = new File("").getCanonicalPath();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File currDir = new File(currPath);
+        File projDir = currDir.getParentFile().getParentFile().getParentFile();
+        File[] projDirs = projDir.listFiles();
+        for (File dir: projDirs) {
+            if (dir.getName().equals("Languages")) {
+                LANGUAGE_DIR = dir.getAbsolutePath();
+                break;
+            }
+        }
         getLanguages();
     }
 
@@ -125,7 +140,7 @@ public class LanguageHandler {
             Scanner scan = new Scanner(dictionaryFile);
             while(scan.hasNextLine()) {
                 String line = scan.nextLine();
-                dictionary.insert(line);
+                dictionary.insert(line.toUpperCase());
             }
             scan.close();
         } catch (FileNotFoundException e) {
